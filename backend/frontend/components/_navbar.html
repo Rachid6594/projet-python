@@ -31,15 +31,6 @@
       {# Liens gauche #}
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
-        {% if current_user.role in ('secretaire','admin') %}
-        <li class="nav-item">
-          <a class="nav-link {% if request.blueprint == 'secretaire' %}active{% endif %}"
-             href="{{ url_for('secretaire.index') }}">
-            <i class="bi bi-speedometer2 me-1"></i>Dashboard
-          </a>
-        </li>
-        {% endif %}
-
         {# Patients & Médecins : secrétaire / admin uniquement #}
         {% if current_user.role in ('secretaire', 'admin') %}
         <li class="nav-item">

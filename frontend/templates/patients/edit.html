@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+<h3 class="fw-bold">
+<i class="bi bi-pencil-square text-warning"></i>
+Modifier le patient
+</h3>
+
+<a href="{{ url_for('patients.index') }}" class="btn btn-outline-secondary">
+<i class="bi bi-arrow-left"></i>
+Retour
+</a>
+
+</div>
+
+<div class="card shadow-sm">
+
+<div class="card-body">
+
+<form method="POST" class="needs-validation" novalidate>
+
+<div class="row">
+
+<div class="col-md-6 mb-3">
+<label class="form-label">Nom</label>
+<input type="text"
+name="nom"
+class="form-control"
+value="{{ patient.nom }}"
+required>
+</div>
+
+<div class="col-md-6 mb-3">
+<label class="form-label">Prénom</label>
+<input type="text"
+name="prenom"
+class="form-control"
+value="{{ patient.prenom }}"
+required>
+</div>
+
+<div class="col-md-6 mb-3">
+<label class="form-label">Date de naissance</label>
+<input type="date"
+id="date_naissance"
+name="date_naissance"
+class="form-control"
+value="{{ patient.date_naissance }}"
+required>
+</div>
+
+<div class="col-md-6 mb-3">
+<label class="form-label">Age</label>
+<span id="ageBadge" class="badge bg-primary fs-6 p-2">
+Calcul automatique
+</span>
+</div>
+
+<div class="col-md-6 mb-3">
+<label class="form-label">Téléphone</label>
+<input type="text"
+name="telephone"
+id="telephone"
+class="form-control"
+value="{{ patient.telephone }}"
+maxlength="11"
+required>
+</div>
+
+<div class="col-md-12 mb-3">
+<label class="form-label">Adresse</label>
+<input type="text"
+name="adresse"
+class="form-control"
+value="{{ patient.adresse }}">
+</div>
+
+<div class="col-md-6 mb-4">
+<label class="form-label">Sexe</label>
+
+<select name="sexe" class="form-select">
+
+<option value="">-- Sélectionner --</option>
+
+<option value="M"
+{% if patient.sexe == 'M' %}selected{% endif %}>
+Masculin
+</option>
+
+<option value="F"
+{% if patient.sexe == 'F' %}selected{% endif %}>
+Féminin
+</option>
+
+</select>
+
+</div>
+
+</div>
+
+<div class="d-flex justify-content-end gap-2">
+
+<a href="{{ url_for('patients.index') }}" class="btn btn-secondary">
+<i class="bi bi-x-circle"></i>
+Annuler
+</a>
+
+<button class="btn btn-success">
+<i class="bi bi-check-circle"></i>
+Enregistrer
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+
+// Calcul automatique de l'âge
+
+document.getElementById("date_naissance")
+.addEventListener("change", function(){
+
+let birthDate = new Date(this.value)
+
+let today = new Date()
+
+let age = today.getFullYear() - birthDate.getFullYear()
+
+let m = today.getMonth() - birthDate.getMonth()
+
+if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+age--
+}
+
+document.getElementById("ageBadge").innerText = age + " ans"
+
+})
+
+
+
+// Format automatique téléphone
+
+document.getElementById("telephone")
+.addEventListener("input", function(){
+
+let value = this.value.replace(/\D/g,'')
+
+if(value.length > 2)
+value = value.replace(/(\d{2})(\d+)/, "$1 $2")
+
+if(value.length > 5)
+value = value.replace(/(\d{2}) (\d{2})(\d+)/, "$1 $2 $3")
+
+if(value.length > 8)
+value = value.replace(/(\d{2}) (\d{2}) (\d{2})(\d+)/, "$1 $2 $3 $4")
+
+this.value = value
+
+})
+
+
+
+// Validation Bootstrap
+
+(() => {
+
+'use strict'
+
+const forms = document.querySelectorAll('.needs-validation')
+
+Array.from(forms).forEach(form => {
+
+form.addEventListener('submit', event => {
+
+if (!form.checkValidity()) {
+
+event.preventDefault()
+event.stopPropagation()
+
+}
+
+form.classList.add('was-validated')
+
+}, false)
+
+})
+
+})()
+
+</script>
+
+{% endblock %}

@@ -1,14 +1,256 @@
-{% extends 'base.html' %}
-{% block title %}Espace Secrétaire{% endblock %}
+{% extends "base.html" %}
 
 {% block content %}
-{# ══════════════════════════════════════════════════════════════════════════
-   ESPACE SECRÉTAIRE — Membres 2 & 3
-   Ce fichier est le point d'entrée de l'espace secrétaire.
-   Tout ce qui concerne la secrétaire se passe dans ce dossier.
 
-   Membre 2 : patients (liste, fiche, historique), tableau de bord
-   Membre 3 : médecins (liste, profil), rendez-vous (CRUD, filtres)
-══════════════════════════════════════════════════════════════════════════ #}
-<p>Espace secrétaire — à développer par les membres 2 & 3.</p>
+<div class="container mt-4">
+
+<h3 class="fw-bold mb-4">
+<i class="bi bi-speedometer2 text-primary"></i>
+Tableau de bord secrétaire
+</h3>
+
+
+<div class="row g-4">
+
+<!-- Patients -->
+
+<div class="col-md-3">
+
+<div class="card shadow-sm border-0">
+
+<div class="card-body text-center">
+
+<i class="bi bi-people-fill text-primary fs-1"></i>
+
+<h4 class="mt-2">{{ total_patients }}</h4>
+
+<p class="text-muted mb-0">Patients</p>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- RDV aujourd'hui -->
+
+<div class="col-md-3">
+
+<div class="card shadow-sm border-0">
+
+<div class="card-body text-center">
+
+<i class="bi bi-calendar-check text-success fs-1"></i>
+
+<h4 class="mt-2">{{ rdv_today }}</h4>
+
+<p class="text-muted mb-0">RDV aujourd'hui</p>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- Consultations -->
+
+<div class="col-md-3">
+
+<div class="card shadow-sm border-0">
+
+<div class="card-body text-center">
+
+<i class="bi bi-heart-pulse text-danger fs-1"></i>
+
+<h4 class="mt-2">{{ consultations }}</h4>
+
+<p class="text-muted mb-0">Consultations</p>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- Médecins -->
+
+<div class="col-md-3">
+
+<div class="card shadow-sm border-0">
+
+<div class="card-body text-center">
+
+<i class="bi bi-person-badge text-warning fs-1"></i>
+
+<h4 class="mt-2">{{ medecins }}</h4>
+
+<p class="text-muted mb-0">Médecins</p>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="card shadow-sm mt-4">
+
+<div class="card-header bg-white fw-bold">
+
+<i class="bi bi-graph-up"></i>
+Consultations par mois
+
+</div>
+
+<div class="card-body">
+
+<canvas id="consultationsChart" height="100"></canvas>
+
+</div>
+
+</div>
+
+
+<!-- Rendez-vous du jour -->
+
+<div class="card shadow-sm mt-4">
+
+<div class="card-header bg-white fw-bold">
+
+<i class="bi bi-calendar-day"></i>
+Rendez-vous du jour
+
+</div>
+
+
+
+<div class="card-body">
+
+<table class="table table-hover">
+
+<thead>
+
+<tr>
+<th>Heure</th>
+<th>Patient</th>
+<th>Médecin</th>
+<th>Motif</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for rdv in rdv_list %}
+
+<tr>
+
+<td>{{ rdv.heure }}</td>
+<td>{{ rdv.patient.nom }} {{ rdv.patient.prenom }}</td>
+<td>{{ rdv.medecin.nom }}</td>
+<td>{{ rdv.motif }}</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+const ctx = document.getElementById('consultationsChart');
+
+if(ctx){
+
+new Chart(ctx, {
+
+type: 'bar',
+
+data: {
+
+labels: '{{ months|tojson }}',
+
+datasets: [{
+
+label: 'Consultations',
+
+data: '{{ consultations_data|tojson }}',
+
+backgroundColor: [
+'#0d6efd',
+'#20c997',
+'#ffc107',
+'#dc3545',
+'#6610f2',
+'#fd7e14',
+'#198754',
+'#6f42c1',
+'#d63384',
+'#0dcaf0',
+'#adb5bd',
+'#343a40'
+],
+
+borderRadius: 8
+
+}]
+
+},
+
+options: {
+
+responsive: true,
+
+animation: {
+duration: 1500,
+easing: 'easeOutQuart'
+},
+
+plugins: {
+legend: { display: false }
+},
+
+
+scales: {
+
+x: {
+ticks: {
+maxRotation: 0,
+minRotation: 0
+}
+},
+
+y: {
+beginAtZero: true
+}
+
+}
+
+
+}
+
+});
+
+}
+
+</script>
+
 {% endblock %}
