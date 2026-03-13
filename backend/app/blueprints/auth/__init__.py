@@ -76,6 +76,17 @@ def logout():
 # ---------------------------------------------------------------------------
 
 def _redirect_after_login(user: Utilisateur):
+
+    if user.role == 'admin':
+        return redirect(url_for('admin.index'))
+
+    if user.role == 'medecin':
+        return redirect(url_for('medecin.index'))
+
+    if user.role == 'secretaire':
+        return redirect(url_for('secretaire.index'))
+
+    return redirect(url_for('auth.login'))
     """Redirige vers la page appropriée selon le rôle de l'utilisateur."""
     if user.role == 'medecin':
         return redirect(url_for('rendez_vous.index'))
