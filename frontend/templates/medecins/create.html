@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+<h3 class="fw-bold">
+<i class="bi bi-person-plus-fill text-primary"></i>
+Ajouter un médecin
+</h3>
+
+<a href="{{ url_for('medecins.index') }}" class="btn btn-outline-secondary">
+<i class="bi bi-arrow-left"></i>
+Retour
+</a>
+
+</div>
+
+<div class="card shadow-sm">
+
+<div class="card-body">
+
+<form method="POST"  class="needs-validation" novalidate>
+
+<div class="row">
+
+<div class="col-md-6 mb-3">
+<label class="form-label">Nom</label>
+<input type="text" name="nom" class="form-control" placeholder="Nom du médecin" required>
+</div>
+
+<div class="col-md-6 mb-3">
+<label class="form-label">Prénom</label>
+<input type="text" name="prenom" class="form-control" placeholder="Prénom du médecin" required>
+</div>
+
+<div class="col-md-6 mb-3">
+<label class="form-label">Spécialité</label>
+<input type="text" name="specialite" class="form-control" placeholder="Ex: Cardiologue, Généraliste..." required>
+</div>
+
+<div class="col-md-6 mb-3">
+<label class="form-label">Téléphone</label>
+<input type="text"
+name="telephone"
+id="telephone"
+class="form-control"
+placeholder="70 00 00 00"
+maxlength="11">
+</div>
+
+<div class="col-md-6 mb-3">
+<label class="form-label">Email</label>
+<input type="email" name="email" class="form-control" placeholder="email@exemple.com" required>
+<small class="text-muted">Servira pour la connexion du médecin</small>
+</div>
+
+<div class="col-md-6 mb-3">
+<label class="form-label">Mot de passe</label>
+<input type="password" name="mot_de_passe" class="form-control" placeholder="Mot de passe par défaut : Medecin123!">
+<small class="text-muted">Laisser vide pour utiliser le mot de passe par défaut</small>
+</div>
+
+</div>
+
+<div class="alert alert-info">
+<i class="bi bi-info-circle"></i>
+Un compte utilisateur avec le rôle <strong>médecin</strong> sera automatiquement créé avec ces informations.
+</div>
+
+<div class="d-flex justify-content-end gap-2">
+
+<a href="{{ url_for('medecins.index') }}" class="btn btn-secondary">
+<i class="bi bi-x-circle"></i>
+Annuler
+</a>
+
+<button class="btn btn-success">
+<i class="bi bi-check-circle"></i>
+Enregistrer
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+
+// Format automatique du téléphone
+
+document.getElementById("telephone")
+.addEventListener("input", function(){
+
+let value = this.value.replace(/\D/g,'')
+
+if(value.length > 2)
+value = value.replace(/(\d{2})(\d+)/, "$1 $2")
+
+if(value.length > 5)
+value = value.replace(/(\d{2}) (\d{2})(\d+)/, "$1 $2 $3")
+
+if(value.length > 8)
+value = value.replace(/(\d{2}) (\d{2}) (\d{2})(\d+)/, "$1 $2 $3 $4")
+
+this.value = value
+
+})
+
+
+
+// Validation Bootstrap
+
+(() => {
+'use strict'
+
+const forms = document.querySelectorAll('.needs-validation')
+
+Array.from(forms).forEach(form => {
+
+form.addEventListener('submit', event => {
+
+if (!form.checkValidity()) {
+
+event.preventDefault()
+event.stopPropagation()
+
+}
+
+form.classList.add('was-validated')
+
+}, false)
+
+})
+
+})()
+
+</script>
+
+{% endblock %}

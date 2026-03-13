@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+<h3 class="fw-bold">
+<i class="bi bi-person-vcard text-info"></i>
+Profil médecin
+</h3>
+
+<a href="{{ url_for('medecins.index') }}" class="btn btn-outline-secondary">
+<i class="bi bi-arrow-left"></i>
+Retour
+</a>
+
+</div>
+
+
+<!-- Informations médecin -->
+
+<div class="card shadow-sm mb-4">
+
+<div class="card-body">
+
+<div class="d-flex justify-content-between">
+
+<div>
+
+<h4 class="fw-bold">
+<i class="bi bi-person-circle text-primary"></i>
+Dr {{ medecin.prenom }} {{ medecin.nom }}
+</h4>
+
+<p class="mb-1">
+<strong>Spécialité :</strong> {{ medecin.specialite }}
+</p>
+
+<p class="mb-1">
+<strong>Téléphone :</strong> {{ medecin.telephone }}
+</p>
+
+<p class="mb-1">
+<strong>Email :</strong> {{ medecin.email }}
+</p>
+
+</div>
+
+<div class="text-end">
+
+<a href="{{ url_for('medecins.edit', id=medecin.id) }}" class="btn btn-warning">
+<i class="bi bi-pencil-square"></i>
+Modifier
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- Statistiques -->
+
+<div class="row mb-4">
+
+<div class="col-md-6">
+
+<div class="card shadow-sm text-center">
+
+<div class="card-body">
+
+<i class="bi bi-calendar-check fs-1 text-primary"></i>
+
+<h5 class="mt-2">Total rendez-vous</h5>
+
+<h3 class="text-primary fw-bold">{{ total_rdv }}</h3>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-6">
+
+<div class="card shadow-sm text-center">
+
+<div class="card-body">
+
+<i class="bi bi-check-circle fs-1 text-success"></i>
+
+<h5 class="mt-2">Consultations effectuées</h5>
+
+<h3 class="text-success fw-bold">{{ rdv_effectues }}</h3>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- RDV à venir -->
+
+<div class="card shadow-sm mb-4">
+
+<div class="card-header fw-bold">
+
+<i class="bi bi-calendar-event"></i>
+Rendez-vous à venir
+
+</div>
+
+<div class="card-body">
+
+<table class="table table-hover">
+
+<thead class="table-light">
+
+<tr>
+<th>Date</th>
+<th>Heure</th>
+<th>Patient</th>
+<th>Motif</th>
+<th>Statut</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for rdv in rdv_a_venir %}
+
+<tr>
+<td>{{ rdv.date }}</td>
+<td>{{ rdv.heure }}</td>
+<td>{{ rdv.patient.prenom }} {{ rdv.patient.nom }}</td>
+<td>{{ rdv.motif }}</td>
+<td>
+{% if rdv.statut == 'programme' %}
+<span class="badge bg-primary">Programmé</span>
+{% elif rdv.statut == 'effectue' %}
+<span class="badge bg-success">Effectué</span>
+{% elif rdv.statut == 'annule' %}
+<span class="badge bg-danger">Annulé</span>
+{% endif %}
+</td>
+</tr>
+
+{% else %}
+
+<tr>
+<td colspan="5" class="text-center text-muted">
+Aucun rendez-vous à venir
+</td>
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}

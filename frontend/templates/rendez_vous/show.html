@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+<h3 class="fw-bold">
+<i class="bi bi-calendar-event text-info"></i>
+Détail du rendez-vous
+</h3>
+
+<a href="{{ url_for('rendez_vous.index') }}" class="btn btn-outline-secondary">
+<i class="bi bi-arrow-left"></i>
+Retour
+</a>
+
+</div>
+
+
+<!-- Informations rendez-vous -->
+
+<div class="card shadow-sm mb-4">
+
+<div class="card-body">
+
+<div class="row">
+
+<div class="col-md-6">
+
+<h5 class="fw-bold mb-3">
+<i class="bi bi-person text-primary"></i>
+Informations patient
+</h5>
+
+<p class="mb-2">
+<strong>Nom :</strong> {{ rdv.patient.prenom }} {{ rdv.patient.nom }}
+</p>
+
+<p class="mb-2">
+<strong>Téléphone :</strong> {{ rdv.patient.telephone }}
+</p>
+
+<p class="mb-2">
+<strong>Sexe :</strong> {{ 'Masculin' if rdv.patient.sexe == 'M' else 'Féminin' }}
+</p>
+
+</div>
+
+<div class="col-md-6">
+
+<h5 class="fw-bold mb-3">
+<i class="bi bi-person-badge text-success"></i>
+Médecin
+</h5>
+
+<p class="mb-2">
+<strong>Nom :</strong> Dr {{ rdv.medecin.prenom }} {{ rdv.medecin.nom }}
+</p>
+
+<p class="mb-2">
+<strong>Spécialité :</strong> {{ rdv.medecin.specialite }}
+</p>
+
+<p class="mb-2">
+<strong>Téléphone :</strong> {{ rdv.medecin.telephone }}
+</p>
+
+</div>
+
+</div>
+
+<hr>
+
+<div class="row">
+
+<div class="col-md-6">
+
+<h5 class="fw-bold mb-3">
+<i class="bi bi-calendar-check text-warning"></i>
+Date et heure
+</h5>
+
+<p class="mb-2">
+<strong>Date :</strong> {{ rdv.date.strftime('%d/%m/%Y') }}
+</p>
+
+<p class="mb-2">
+<strong>Heure :</strong> {{ rdv.heure.strftime('%H:%M') }}
+</p>
+
+</div>
+
+<div class="col-md-6">
+
+<h5 class="fw-bold mb-3">
+<i class="bi bi-info-circle text-info"></i>
+Statut
+</h5>
+
+<p class="mb-2">
+{% if rdv.statut == 'programme' %}
+<span class="badge bg-primary fs-6">Programmé</span>
+{% elif rdv.statut == 'effectue' %}
+<span class="badge bg-success fs-6">Effectué</span>
+{% elif rdv.statut == 'annule' %}
+<span class="badge bg-danger fs-6">Annulé</span>
+{% endif %}
+</p>
+
+</div>
+
+</div>
+
+{% if rdv.motif %}
+<hr>
+
+<h5 class="fw-bold mb-3">
+<i class="bi bi-chat-left-text text-secondary"></i>
+Motif de la consultation
+</h5>
+
+<p class="mb-0">{{ rdv.motif }}</p>
+
+{% endif %}
+
+</div>
+
+</div>
+
+
+<!-- Actions -->
+
+{% if current_user.role in ['secretaire', 'admin'] %}
+
+<div class="card shadow-sm">
+
+<div class="card-body">
+
+<h5 class="fw-bold mb-3">Actions</h5>
+
+<div class="d-flex gap-2">
+
+{% if rdv.statut == 'programme' %}
+
+<a href="{{ url_for('rendez_vous.edit', id=rdv.id) }}" class="btn btn-warning">
+<i class="bi bi-pencil-square"></i>
+Modifier
+</a>
+
+<form method="POST" action="{{ url_for('rendez_vous.cancel', id=rdv.id) }}" style="display: inline;">
+<button class="btn btn-danger"
+onclick="return confirm('Voulez-vous vraiment annuler ce rendez-vous ?')">
+<i class="bi bi-x-circle"></i>
+Annuler le rendez-vous
+</button>
+</form>
+
+{% elif rdv.statut == 'annule' %}
+
+<div class="alert alert-danger mb-0">
+<i class="bi bi-x-circle"></i>
+Ce rendez-vous a été annulé.
+</div>
+
+{% elif rdv.statut == 'effectue' %}
+
+<div class="alert alert-success mb-0">
+<i class="bi bi-check-circle"></i>
+Ce rendez-vous a été effectué.
+{% if rdv.consultation %}
+<a href="{{ url_for('consultations.show', id=rdv.consultation.id) }}" class="alert-link">
+Voir la consultation
+</a>
+{% endif %}
+</div>
+
+{% endif %}
+
+</div>
+
+</div>
+
+</div>
+
+{% endif %}
+
+</div>
+
+{% endblock %}
