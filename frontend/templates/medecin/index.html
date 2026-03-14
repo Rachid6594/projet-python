@@ -1,14 +1,89 @@
-{% extends 'base.html' %}
-{% block title %}Espace Médecin{% endblock %}
+{% extends "base.html" %}
+{% block title %}Tableau de bord Médecin{% endblock %}
 
 {% block content %}
-{# ══════════════════════════════════════════════════════════════════════════
-   ESPACE MÉDECIN — Membre 4
-   Ce fichier est le point d'entrée de l'espace médecin.
-   Tout ce qui concerne le médecin se passe dans ce dossier.
+<div class="container mt-4">
+  <h2 class="mb-4">Tableau de bord du Dr. {{ current_user.prenom }} {{ current_user.nom }}</h2>
+<a href="{{ url_for('medecin.calendrier') }}" class="btn btn-outline-primary mb-4">
+   Voir le calendrier des rendez-vous
+</a>
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card text-center shadow">
+        <div class="card-body">
+          <h5 class="card-title">Consultations ce mois</h5>
+          <p class="display-5">{{ nb_consultations }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center shadow">
+        <div class="card-body">
+          <h5 class="card-title">Patients vus</h5>
+          <p class="display-5">{{ nb_patients }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center shadow">
+        <div class="card-body">
+          <h5 class="card-title">Spécialité</h5>
+          <p class="display-6">{{ specialite }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
-   Membre 4 : tableau de bord médecin, calendrier FullCalendar.js,
-              interface de consultation (symptômes, diagnostic, traitement)
-══════════════════════════════════════════════════════════════════════════ #}
-<p>Espace médecin — à développer par le membre 4.</p>
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          Prochain rendez-vous
+        </div>
+        <div class="card-body">
+          {% if prochain_rdv %}
+            <strong>Heure :</strong> {{ prochain_rdv.heure.strftime('%H:%M') }}<br>
+            <strong>Patient :</strong> {{ prochain_rdv.patient.nom }} {{ prochain_rdv.patient.prenom }}<br>
+            <strong>Motif :</strong> {{ prochain_rdv.motif or "—" }}
+          {% else %}
+            <em>Aucun rendez-vous à venir aujourd'hui.</em>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card shadow">
+        <div class="card-header bg-success text-white">
+          Dernier patient consulté
+        </div>
+        <div class="card-body">
+          {% if dernier_patient %}
+            <strong>Nom :</strong> {{ dernier_patient.nom }} {{ dernier_patient.prenom }}<br>
+            <strong>Date de naissance :</strong> {{ dernier_patient.date_naissance.strftime('%d/%m/%Y') }}
+          {% else %}
+            <em>Aucune consultation récente.</em>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h4 class="mb-3">Rendez-vous du jour</h4>
+  {% if rdv_du_jour %}
+    <ul class="list-group">
+      {% for rdv in rdv_du_jour %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            <strong>{{ rdv.heure.strftime('%H:%M') }}</strong> — 
+            {{ rdv.patient.nom }} {{ rdv.patient.prenom }}
+            <span class="text-muted">({{ rdv.motif or "—" }})</span>
+          </div>
+          <span class="badge bg-secondary">{{ rdv.statut }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="alert alert-info">Aucun rendez-vous prévu aujourd'hui.</div>
+  {% endif %}
+</div>
 {% endblock %}
