@@ -1,2 +1,4 @@
-from app.forms.auth import LoginForm, RegisterForm
-from app.forms.post import PostForm
+from app.forms.auth import LoginForm
+from app.forms.patient import PatientForm
+from app.forms.rendezvous import RendezVousForm
+from app.forms.consultation import ConsultationForm

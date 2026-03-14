@@ -1,0 +1,1 @@
+/* HôpiGest - scripts optionnels */

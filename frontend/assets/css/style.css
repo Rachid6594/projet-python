@@ -1,0 +1,3 @@
+/* HôpiGest - styles personnalisés */
+.sidebar { min-height: 100vh; }
+.nav-link:hover { opacity: 0.9; }
