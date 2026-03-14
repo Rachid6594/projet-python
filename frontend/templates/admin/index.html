@@ -1,12 +1,16 @@
 {% extends 'base.html' %}
-{% block title %}Administration — Cabinet Médical{% endblock %}
+{% block title %}Administration — HopiGest{% endblock %}
 
 {% block content %}
+
+{# -- En-tete -- #}
 <div class="d-flex justify-content-between align-items-center mb-4">
-  <h1 class="h3 mb-0"><i class="bi bi-shield-lock me-2"></i>Panneau d'administration</h1>
+  <h1 class="h3 mb-0">
+    <i class="bi bi-shield-lock me-2"></i>Administration
+  </h1>
 </div>
 
-{# ── Cartes statistiques ── #}
+{# -- Cartes statistiques -- #}
 <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-4 mb-4">
 
   <div class="col">
@@ -16,8 +20,8 @@
           <i class="bi bi-people fs-4 text-primary"></i>
         </div>
         <div>
-          <div class="fs-2 fw-bold">{{ stats.patients }}</div>
-          <div class="text-muted small">Patients</div>
+          <div class="fs-2 fw-bold">{{ stats.utilisateurs }}</div>
+          <div class="text-muted small">Utilisateurs</div>
         </div>
       </div>
     </div>
@@ -31,7 +35,21 @@
         </div>
         <div>
           <div class="fs-2 fw-bold">{{ stats.medecins }}</div>
-          <div class="text-muted small">Médecins</div>
+          <div class="text-muted small">Medecins</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body d-flex align-items-center gap-3">
+        <div class="rounded-circle bg-warning bg-opacity-10 p-3">
+          <i class="bi bi-heart-pulse fs-4 text-warning"></i>
+        </div>
+        <div>
+          <div class="fs-2 fw-bold">{{ stats.patients }}</div>
+          <div class="text-muted small">Patients</div>
         </div>
       </div>
     </div>
@@ -45,21 +63,7 @@
         </div>
         <div>
           <div class="fs-2 fw-bold">{{ stats.secretaires }}</div>
-          <div class="text-muted small">Secrétaires</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="col">
-    <div class="card border-0 shadow-sm h-100">
-      <div class="card-body d-flex align-items-center gap-3">
-        <div class="rounded-circle bg-warning bg-opacity-10 p-3">
-          <i class="bi bi-person-gear fs-4 text-warning"></i>
-        </div>
-        <div>
-          <div class="fs-2 fw-bold">{{ stats.utilisateurs }}</div>
-          <div class="text-muted small">Comptes totaux</div>
+          <div class="text-muted small">Secretaires</div>
         </div>
       </div>
     </div>
@@ -67,35 +71,19 @@
 
 </div>
 
-{# ── Actions rapides ── #}
+{# -- Actions rapides -- #}
 <div class="card border-0 shadow-sm">
   <div class="card-header bg-transparent fw-semibold">
     <i class="bi bi-lightning me-1"></i>Actions rapides
   </div>
   <div class="card-body d-flex flex-wrap gap-2">
     <a href="{{ url_for('admin.utilisateurs') }}" class="btn btn-outline-primary">
-      <i class="bi bi-person-lines-fill me-1"></i>Gérer les comptes
+      <i class="bi bi-person-lines-fill me-1"></i>Gerer les comptes
     </a>
-    {# Lien vers la page utilisateurs avec l'ancre pour déclencher le modal secrétaire #}
-    <a href="{{ url_for('admin.utilisateurs') }}?creer=secretaire" class="btn btn-outline-secondary">
-      <i class="bi bi-person-plus me-1"></i>Nouvelle secrétaire
-    </a>
-    <a href="{{ url_for('admin.utilisateurs') }}?creer=medecin" class="btn btn-primary">
-      <i class="bi bi-person-badge me-1"></i>Nouveau médecin
+    <a href="{{ url_for('statistiques.index') }}" class="btn btn-outline-secondary">
+      <i class="bi bi-graph-up me-1"></i>Voir les statistiques
     </a>
   </div>
 </div>
 
-{% endblock %}
-
-{% block scripts %}
-<script>
-  // Si on arrive depuis le dashboard avec ?creer=role, ouvrir le modal automatiquement
-  const params = new URLSearchParams(window.location.search);
-  const roleCreer = params.get('creer');
-  if (roleCreer && document.getElementById('modalCreer')) {
-    ouvrirModalCreation(roleCreer);
-    new bootstrap.Modal(document.getElementById('modalCreer')).show();
-  }
-</script>
 {% endblock %}

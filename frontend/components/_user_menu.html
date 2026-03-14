@@ -1,26 +1,20 @@
-{# ─────────────────────────────────────────────────────────────────────────
-   Composant : menu utilisateur (coin droit de la navbar)
-   Inclus dans : components/_navbar.html
-   Dépendances : current_user (Flask-Login)
-───────────────────────────────────────────────────────────────────────── #}
-<ul class="navbar-nav ms-auto d-flex align-items-center gap-2">
-
-  {# ── Infos utilisateur connecté ── #}
-  <li class="nav-item">
-    <span class="navbar-text d-flex align-items-center gap-2 text-white">
-      <i class="bi bi-person-circle fs-5"></i>
-      <span>{{ current_user.prenom }} {{ current_user.nom }}</span>
-      <span class="badge bg-secondary">{{ current_user.role }}</span>
-    </span>
-  </li>
-
-  {# ── Bouton déconnexion visible directement ── #}
-  <li class="nav-item">
-    <a href="{{ url_for('auth.logout') }}"
-       class="btn btn-outline-light btn-sm d-flex align-items-center gap-1">
-      <i class="bi bi-box-arrow-right"></i>
-      Déconnexion
-    </a>
-  </li>
-
-</ul>
+{# ── Topbar ── #}
+<header class="topbar">
+  <div class="topbar-left">
+    <button class="sidebar-toggle" onclick="toggleSidebar()">
+      <i class="bi bi-list"></i>
+    </button>
+    <h1 class="topbar-title">{% block page_title %}{% endblock %}</h1>
+  </div>
+  <div class="topbar-right">
+    <div class="topbar-user">
+      <div class="topbar-avatar">
+        {{ current_user.prenom[0] }}{{ current_user.nom[0] }}
+      </div>
+      <div>
+        <div class="topbar-user-name">{{ current_user.prenom }} {{ current_user.nom }}</div>
+        <div class="topbar-user-role">{{ current_user.role }}</div>
+      </div>
+    </div>
+  </div>
+</header>

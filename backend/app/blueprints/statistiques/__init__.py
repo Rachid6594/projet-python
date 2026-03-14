@@ -17,7 +17,7 @@ Routes :
 from datetime import datetime
 from flask import Blueprint, render_template, request
 from flask_login import login_required
-from sqlalchemy import func, and_
+from sqlalchemy import func, and_, literal
 
 from app.extensions import db
 from app.models.consultation import Consultation
@@ -66,6 +66,12 @@ def index():
         rdv_counts[mois_idx] = count
 
     # ─── Consultations par médecin (graphique camembert) ────────────────────
+    date_filters = and_(
+        func.strftime('%Y', RendezVous.date) == str(annee),
+        func.strftime('%m', RendezVous.date) >= str(mois_debut).zfill(2),
+        func.strftime('%m', RendezVous.date) <= str(mois_fin).zfill(2),
+    )
+
     cons_par_medecin_raw = db.session.query(
         Medecin.id,
         Medecin.nom,
@@ -76,7 +82,7 @@ def index():
         RendezVous, RendezVous.medecin_id == Medecin.id
     ).join(
         Consultation, Consultation.rendez_vous_id == RendezVous.id
-    ).filter(rdv_query.statement.whereclause if rdv_query.statement.whereclause else True
+    ).filter(date_filters
     ).group_by(Medecin.id, Medecin.nom, Medecin.prenom, Medecin.specialite
     ).order_by(func.count(Consultation.id).desc()).all()
 
@@ -91,7 +97,7 @@ def index():
         RendezVous, RendezVous.medecin_id == Medecin.id
     ).join(
         Consultation, Consultation.rendez_vous_id == RendezVous.id
-    ).filter(rdv_query.statement.whereclause if rdv_query.statement.whereclause else True
+    ).filter(date_filters
     ).group_by(Medecin.specialite
     ).order_by(func.count(Consultation.id).desc()).all()
 

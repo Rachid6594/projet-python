@@ -1,256 +1,159 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+
+{% block title %}Tableau de bord - HopiGest{% endblock %}
 
 {% block content %}
-
-<div class="container mt-4">
-
-<h3 class="fw-bold mb-4">
-<i class="bi bi-speedometer2 text-primary"></i>
-Tableau de bord secrétaire
-</h3>
-
-
-<div class="row g-4">
-
-<!-- Patients -->
-
-<div class="col-md-3">
-
-<div class="card shadow-sm border-0">
-
-<div class="card-body text-center">
-
-<i class="bi bi-people-fill text-primary fs-1"></i>
-
-<h4 class="mt-2">{{ total_patients }}</h4>
-
-<p class="text-muted mb-0">Patients</p>
-
+<!-- Page Header -->
+<div class="page-header">
+  <h1><i class="bi bi-grid-1x2"></i> Tableau de bord</h1>
 </div>
 
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-xl-3 col-md-6">
+    <div class="stat-card animate-in">
+      <div class="stat-card-icon blue">
+        <i class="bi bi-people"></i>
+      </div>
+      <div class="stat-card-info">
+        <h3>{{ stats.patients }}</h3>
+        <p>Patients</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="stat-card animate-in" style="animation-delay:.05s">
+      <div class="stat-card-icon green">
+        <i class="bi bi-calendar-check"></i>
+      </div>
+      <div class="stat-card-info">
+        <h3>{{ stats.rdv_aujourdhui }}</h3>
+        <p>RDV aujourd'hui</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="stat-card animate-in" style="animation-delay:.1s">
+      <div class="stat-card-icon orange">
+        <i class="bi bi-clipboard2-pulse"></i>
+      </div>
+      <div class="stat-card-info">
+        <h3>{{ stats.consultations_mois }}</h3>
+        <p>Consultations ce mois</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="stat-card animate-in" style="animation-delay:.15s">
+      <div class="stat-card-icon cyan">
+        <i class="bi bi-person-badge"></i>
+      </div>
+      <div class="stat-card-info">
+        <h3>{{ stats.medecins }}</h3>
+        <p>Medecins</p>
+      </div>
+    </div>
+  </div>
 </div>
 
+<!-- Chart: Consultations par mois -->
+<div class="row g-3 mb-4">
+  <div class="col-12">
+    <div class="card animate-in" style="animation-delay:.2s">
+      <div class="card-header d-flex align-items-center gap-2">
+        <i class="bi bi-bar-chart-line"></i>
+        <strong>Consultations par mois</strong>
+      </div>
+      <div class="card-body">
+        <canvas id="chartConsultations" height="280"></canvas>
+      </div>
+    </div>
+  </div>
 </div>
 
-
-<!-- RDV aujourd'hui -->
-
-<div class="col-md-3">
-
-<div class="card shadow-sm border-0">
-
-<div class="card-body text-center">
-
-<i class="bi bi-calendar-check text-success fs-1"></i>
-
-<h4 class="mt-2">{{ rdv_today }}</h4>
-
-<p class="text-muted mb-0">RDV aujourd'hui</p>
-
+<!-- Table: RDV du jour -->
+<div class="row g-3">
+  <div class="col-12">
+    <div class="card animate-in" style="animation-delay:.25s">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-calendar2-event"></i>
+          <strong>Rendez-vous du jour</strong>
+        </div>
+        <span class="badge badge-primary">{{ rdv_aujourdhui|length }} RDV</span>
+      </div>
+      <div class="card-body p-0">
+        {% if rdv_aujourdhui %}
+        <table class="table mb-0">
+          <thead>
+            <tr>
+              <th>Heure</th>
+              <th>Patient</th>
+              <th>Medecin</th>
+              <th>Motif</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for rdv in rdv_aujourdhui %}
+            <tr>
+              <td><span class="badge badge-info">{{ rdv.heure.strftime('%H:%M') }}</span></td>
+              <td>{{ rdv.patient.nom_complet }}</td>
+              <td>{{ rdv.medecin.nom_complet }}</td>
+              <td>{{ rdv.motif }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+          <i class="bi bi-calendar-x d-block"></i>
+          <h4>Aucun rendez-vous aujourd'hui</h4>
+          <p>Il n'y a pas de rendez-vous programme pour aujourd'hui.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 </div>
-
-</div>
-
-</div>
-
-
-<!-- Consultations -->
-
-<div class="col-md-3">
-
-<div class="card shadow-sm border-0">
-
-<div class="card-body text-center">
-
-<i class="bi bi-heart-pulse text-danger fs-1"></i>
-
-<h4 class="mt-2">{{ consultations }}</h4>
-
-<p class="text-muted mb-0">Consultations</p>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- Médecins -->
-
-<div class="col-md-3">
-
-<div class="card shadow-sm border-0">
-
-<div class="card-body text-center">
-
-<i class="bi bi-person-badge text-warning fs-1"></i>
-
-<h4 class="mt-2">{{ medecins }}</h4>
-
-<p class="text-muted mb-0">Médecins</p>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-
-<div class="card shadow-sm mt-4">
-
-<div class="card-header bg-white fw-bold">
-
-<i class="bi bi-graph-up"></i>
-Consultations par mois
-
-</div>
-
-<div class="card-body">
-
-<canvas id="consultationsChart" height="100"></canvas>
-
-</div>
-
-</div>
-
-
-<!-- Rendez-vous du jour -->
-
-<div class="card shadow-sm mt-4">
-
-<div class="card-header bg-white fw-bold">
-
-<i class="bi bi-calendar-day"></i>
-Rendez-vous du jour
-
-</div>
-
-
-
-<div class="card-body">
-
-<table class="table table-hover">
-
-<thead>
-
-<tr>
-<th>Heure</th>
-<th>Patient</th>
-<th>Médecin</th>
-<th>Motif</th>
-</tr>
-
-</thead>
-
-<tbody>
-
-{% for rdv in rdv_list %}
-
-<tr>
-
-<td>{{ rdv.heure }}</td>
-<td>{{ rdv.patient.nom }} {{ rdv.patient.prenom }}</td>
-<td>{{ rdv.medecin.nom }}</td>
-<td>{{ rdv.motif }}</td>
-
-</tr>
-
-{% endfor %}
-
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-
-</div>
-
 {% endblock %}
 
-
 {% block scripts %}
-
 <script>
-
-const ctx = document.getElementById('consultationsChart');
-
-if(ctx){
-
-new Chart(ctx, {
-
-type: 'bar',
-
-data: {
-
-labels: '{{ months|tojson }}',
-
-datasets: [{
-
-label: 'Consultations',
-
-data: '{{ consultations_data|tojson }}',
-
-backgroundColor: [
-'#0d6efd',
-'#20c997',
-'#ffc107',
-'#dc3545',
-'#6610f2',
-'#fd7e14',
-'#198754',
-'#6f42c1',
-'#d63384',
-'#0dcaf0',
-'#adb5bd',
-'#343a40'
-],
-
-borderRadius: 8
-
-}]
-
-},
-
-options: {
-
-responsive: true,
-
-animation: {
-duration: 1500,
-easing: 'easeOutQuart'
-},
-
-plugins: {
-legend: { display: false }
-},
-
-
-scales: {
-
-x: {
-ticks: {
-maxRotation: 0,
-minRotation: 0
-}
-},
-
-y: {
-beginAtZero: true
-}
-
-}
-
-
-}
-
+document.addEventListener('DOMContentLoaded', function() {
+  var ctx = document.getElementById('chartConsultations').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: {{ mois_labels|tojson }},
+      datasets: [{
+        label: 'Consultations',
+        data: {{ consultations_par_mois|tojson }},
+        backgroundColor: 'rgba(15, 111, 236, 0.15)',
+        borderColor: '#0f6fec',
+        borderWidth: 2,
+        borderRadius: 6,
+        hoverBackgroundColor: 'rgba(15, 111, 236, 0.3)'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { stepSize: 1, font: { size: 12, family: 'Inter' }, color: '#64748b' },
+          grid: { color: '#e2e8f0' }
+        },
+        x: {
+          ticks: { font: { size: 12, family: 'Inter' }, color: '#64748b' },
+          grid: { display: false }
+        }
+      }
+    }
+  });
 });
-
-}
-
 </script>
-
 {% endblock %}

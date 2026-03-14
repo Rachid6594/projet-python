@@ -1,189 +1,128 @@
 {% extends "base.html" %}
 
+{% block title %}Nouveau patient - HopiGest{% endblock %}
+
 {% block content %}
 
-<div class="container mt-4">
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-
-<h3 class="fw-bold">
-<i class="bi bi-person-plus-fill text-primary"></i>
-Ajouter un patient
-</h3>
-
-<a href="{{ url_for('patients.index') }}" class="btn btn-outline-secondary">
-<i class="bi bi-arrow-left"></i>
-Retour
-</a>
-
+<!-- Page Header -->
+<div class="page-header">
+  <h1><i class="bi bi-person-plus-fill"></i> Nouveau patient</h1>
+  <a href="{{ url_for('patients.index') }}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i>Retour
+  </a>
 </div>
 
-<div class="card shadow-sm">
+<!-- Create Form -->
+<div class="card animate-in">
+  <div class="card-header">
+    <i class="bi bi-clipboard-plus me-2"></i>Informations du patient
+  </div>
+  <div class="card-body">
+    <form action="{{ url_for('patients.create') }}" method="POST" class="needs-validation" novalidate>
+      <div class="row">
 
-<div class="card-body">
+        <div class="col-md-6 mb-3">
+          <label for="nom" class="form-label">Nom <span class="text-danger">*</span></label>
+          <input type="text" name="nom" id="nom" class="form-control" placeholder="Nom du patient" required>
+          <div class="invalid-feedback">Le nom est obligatoire.</div>
+        </div>
 
-<form method="POST"  class="needs-validation" novalidate>
+        <div class="col-md-6 mb-3">
+          <label for="prenom" class="form-label">Prenom <span class="text-danger">*</span></label>
+          <input type="text" name="prenom" id="prenom" class="form-control" placeholder="Prenom du patient" required>
+          <div class="invalid-feedback">Le prenom est obligatoire.</div>
+        </div>
 
-<div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="date_naissance" class="form-label">Date de naissance <span class="text-danger">*</span></label>
+          <input type="date" name="date_naissance" id="date_naissance" class="form-control" required>
+          <div class="invalid-feedback">La date de naissance est obligatoire.</div>
+        </div>
 
-<div class="col-md-6 mb-3">
-<label class="form-label">Nom</label>
-<input type="text" name="nom" class="form-control" placeholder="Nom du patient" required>
-</div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Age</label>
+          <div class="mt-1">
+            <span id="ageBadge" class="badge badge-primary" style="font-size: 1rem; padding: 0.5rem 1rem;">-- ans</span>
+          </div>
+        </div>
 
-<div class="col-md-6 mb-3">
-<label class="form-label">Prénom</label>
-<input type="text" name="prenom" class="form-control" placeholder="Prénom du patient" required>
-</div>
+        <div class="col-md-6 mb-3">
+          <label for="telephone" class="form-label">Telephone</label>
+          <input type="text" name="telephone" id="telephone" class="form-control" placeholder="70 00 00 00" maxlength="11">
+        </div>
 
-<div class="col-md-6 mb-3">
-<label class="form-label">Date de naissance</label>
-<input type="date"
-name="date_naissance"
-id="date_naissance"
-class="form-control"
-required></div>
+        <div class="col-md-6 mb-3">
+          <label for="sexe" class="form-label">Sexe</label>
+          <select name="sexe" id="sexe" class="form-select">
+            <option value="">-- Selectionner --</option>
+            <option value="M">Masculin</option>
+            <option value="F">Feminin</option>
+          </select>
+        </div>
 
-<div class="col-md-6 mb-3">
+        <div class="col-12 mb-3">
+          <label for="adresse" class="form-label">Adresse</label>
+          <textarea name="adresse" id="adresse" class="form-control" rows="3" placeholder="Adresse du patient"></textarea>
+        </div>
 
-<label class="form-label">Age</label>
+      </div>
 
-<div class="mt-2">
-<span id="ageBadge" class="badge bg-primary fs-6">
--- ans
-</span>
-</div>
+      <hr>
 
-</div>
-
-<div class="col-md-6 mb-3">
-<label class="form-label">Téléphone</label>
-<input type="text"
-name="telephone"
-id="telephone"
-class="form-control"
-placeholder="70 00 00 00"
-maxlength="11"
-required>
-</div>
-
-<div class="col-md-12 mb-3">
-<label class="form-label">Adresse</label>
-<input type="text" name="adresse" class="form-control" placeholder="Adresse du patient">
-</div>
-
-<div class="col-md-6 mb-4">
-<label class="form-label">Sexe</label>
-<select name="sexe" class="form-select">
-<option value="">-- Sélectionner --</option>
-<option value="M">Masculin</option>
-<option value="F">Féminin</option>
-</select>
-</div>
-
-</div>
-
-<div class="d-flex justify-content-end gap-2">
-
-<a href="{{ url_for('patients.index') }}" class="btn btn-secondary">
-<i class="bi bi-x-circle"></i>
-Annuler
-</a>
-
-<button class="btn btn-success">
-<i class="bi bi-check-circle"></i>
-Enregistrer
-</button>
-
-</div>
-
-</form>
-
-</div>
-
-</div>
-
+      <div class="d-flex justify-content-end gap-2">
+        <a href="{{ url_for('patients.index') }}" class="btn btn-outline-secondary">
+          <i class="bi bi-x-lg me-1"></i>Annuler
+        </a>
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-check-lg me-1"></i>Enregistrer
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
 
 {% endblock %}
 
 {% block scripts %}
-
 <script>
+// Auto-calculate age from date of birth
+document.getElementById('date_naissance').addEventListener('change', function() {
+  var birthDate = new Date(this.value);
+  var today = new Date();
+  var age = today.getFullYear() - birthDate.getFullYear();
+  var m = today.getMonth() - birthDate.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  if (age >= 0 && age < 150) {
+    document.getElementById('ageBadge').innerText = age + ' ans';
+  } else {
+    document.getElementById('ageBadge').innerText = '-- ans';
+  }
+});
 
-// Calcul automatique de l'âge
+// Phone number auto-format
+document.getElementById('telephone').addEventListener('input', function() {
+  var value = this.value.replace(/\D/g, '');
+  if (value.length > 2) value = value.replace(/(\d{2})(\d+)/, '$1 $2');
+  if (value.length > 5) value = value.replace(/(\d{2}) (\d{2})(\d+)/, '$1 $2 $3');
+  if (value.length > 8) value = value.replace(/(\d{2}) (\d{2}) (\d{2})(\d+)/, '$1 $2 $3 $4');
+  this.value = value;
+});
 
-const birthInput = document.getElementById("date_naissance")
-
-if(birthInput){
-
-birthInput.addEventListener("change", function(){
-
-let birthDate = new Date(this.value)
-let today = new Date()
-
-let age = today.getFullYear() - birthDate.getFullYear()
-
-let m = today.getMonth() - birthDate.getMonth()
-
-if(m < 0 || (m === 0 && today.getDate() < birthDate.getDate())){
-age--
-}
-
-document.getElementById("ageBadge").innerText = age + " ans"
-})
-
-}
-
-
-// Format automatique du téléphone
-
-document.getElementById("telephone")
-.addEventListener("input", function(){
-
-let value = this.value.replace(/\D/g,'')
-
-if(value.length > 2)
-value = value.replace(/(\d{2})(\d+)/, "$1 $2")
-
-if(value.length > 5)
-value = value.replace(/(\d{2}) (\d{2})(\d+)/, "$1 $2 $3")
-
-if(value.length > 8)
-value = value.replace(/(\d{2}) (\d{2}) (\d{2})(\d+)/, "$1 $2 $3 $4")
-
-this.value = value
-
-})
-
-
-
-// Validation Bootstrap
-
-(() => {
-'use strict'
-
-const forms = document.querySelectorAll('.needs-validation')
-
-Array.from(forms).forEach(form => {
-
-form.addEventListener('submit', event => {
-
-if (!form.checkValidity()) {
-
-event.preventDefault()
-event.stopPropagation()
-
-}
-
-form.classList.add('was-validated')
-
-}, false)
-
-})
-
-})()
-
+// Bootstrap form validation
+(function() {
+  'use strict';
+  var forms = document.querySelectorAll('.needs-validation');
+  Array.from(forms).forEach(function(form) {
+    form.addEventListener('submit', function(event) {
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      form.classList.add('was-validated');
+    }, false);
+  });
+})();
 </script>
-
 {% endblock %}

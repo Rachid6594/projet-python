@@ -1,171 +1,119 @@
 {% extends "base.html" %}
 
+{% block title %}Modifier medecin - HopiGest{% endblock %}
+
 {% block content %}
 
-<div class="container mt-4">
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-
-<h3 class="fw-bold">
-<i class="bi bi-pencil-square text-warning"></i>
-Modifier le médecin
-</h3>
-
-<a href="{{ url_for('medecins.index') }}" class="btn btn-outline-secondary">
-<i class="bi bi-arrow-left"></i>
-Retour
-</a>
-
+<!-- Page Header -->
+<div class="page-header">
+  <h1><i class="bi bi-pencil-square"></i> Modifier medecin</h1>
+  <a href="{{ url_for('medecins.index') }}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i>Retour
+  </a>
 </div>
 
-<div class="card shadow-sm">
+<!-- Edit Form -->
+<div class="card animate-in">
+  <div class="card-header">
+    <i class="bi bi-clipboard-check me-2"></i>Informations du medecin
+  </div>
+  <div class="card-body">
+    <form action="{{ url_for('medecins.edit', id=medecin.id) }}" method="POST" class="needs-validation" novalidate>
+      <div class="row">
 
-<div class="card-body">
+        <div class="col-md-6 mb-3">
+          <label for="nom" class="form-label">Nom <span class="text-danger">*</span></label>
+          <input type="text" name="nom" id="nom" class="form-control" value="{{ medecin.nom }}" placeholder="Nom du medecin" required>
+          <div class="invalid-feedback">Le nom est obligatoire.</div>
+        </div>
 
-<form method="POST" class="needs-validation" novalidate>
+        <div class="col-md-6 mb-3">
+          <label for="prenom" class="form-label">Prenom <span class="text-danger">*</span></label>
+          <input type="text" name="prenom" id="prenom" class="form-control" value="{{ medecin.prenom }}" placeholder="Prenom du medecin" required>
+          <div class="invalid-feedback">Le prenom est obligatoire.</div>
+        </div>
 
-<div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="specialite" class="form-label">Specialite</label>
+          <input type="text" name="specialite" id="specialite" class="form-control" value="{{ medecin.specialite or '' }}" placeholder="Ex: Cardiologie, Pediatrie...">
+        </div>
 
-<div class="col-md-6 mb-3">
-<label class="form-label">Nom</label>
-<input type="text"
-name="nom"
-class="form-control"
-value="{{ medecin.nom }}"
-required>
-</div>
+        <div class="col-md-6 mb-3">
+          <label for="telephone" class="form-label">Telephone</label>
+          <input type="text" name="telephone" id="telephone" class="form-control" value="{{ medecin.telephone or '' }}" placeholder="70 00 00 00" maxlength="11">
+        </div>
 
-<div class="col-md-6 mb-3">
-<label class="form-label">Prénom</label>
-<input type="text"
-name="prenom"
-class="form-control"
-value="{{ medecin.prenom }}"
-required>
-</div>
+        <div class="col-md-6 mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" name="email" id="email" class="form-control" value="{{ medecin.email or '' }}" placeholder="medecin@hopital.com">
+        </div>
 
-<div class="col-md-6 mb-3">
-<label class="form-label">Spécialité</label>
-<input type="text"
-name="specialite"
-class="form-control"
-value="{{ medecin.specialite }}"
-required>
-</div>
+        <div class="col-md-6 mb-3">
+          <label for="mot_de_passe" class="form-label">Mot de passe</label>
+          <div class="input-group">
+            <input type="password" name="mot_de_passe" id="mot_de_passe" class="form-control" placeholder="Laisser vide pour conserver l'actuel">
+            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword()">
+              <i class="bi bi-eye" id="toggleIcon"></i>
+            </button>
+          </div>
+          <div class="form-text text-muted">Laissez vide pour ne pas modifier le mot de passe.</div>
+        </div>
 
-<div class="col-md-6 mb-3">
-<label class="form-label">Téléphone</label>
-<input type="text"
-name="telephone"
-id="telephone"
-class="form-control"
-value="{{ medecin.telephone }}"
-maxlength="11">
-</div>
+      </div>
 
-<div class="col-md-6 mb-3">
-<label class="form-label">Email</label>
-<input type="email"
-name="email"
-class="form-control"
-value="{{ medecin.email }}"
-required>
-<small class="text-muted">Email de connexion du médecin</small>
-</div>
+      <hr>
 
-<div class="col-md-6 mb-3">
-<label class="form-label">Nouveau mot de passe (optionnel)</label>
-<input type="password"
-name="mot_de_passe"
-class="form-control"
-placeholder="Laisser vide pour ne pas changer">
-<small class="text-muted">Modifier uniquement si nécessaire</small>
-</div>
-
-</div>
-
-<div class="alert alert-warning">
-<i class="bi bi-exclamation-triangle"></i>
-Les modifications affecteront aussi le compte utilisateur associé.
-</div>
-
-<div class="d-flex justify-content-end gap-2">
-
-<a href="{{ url_for('medecins.index') }}" class="btn btn-secondary">
-<i class="bi bi-x-circle"></i>
-Annuler
-</a>
-
-<button class="btn btn-success">
-<i class="bi bi-check-circle"></i>
-Enregistrer
-</button>
-
-</div>
-
-</form>
-
-</div>
-
-</div>
-
+      <div class="d-flex justify-content-end gap-2">
+        <a href="{{ url_for('medecins.index') }}" class="btn btn-outline-secondary">
+          <i class="bi bi-x-lg me-1"></i>Annuler
+        </a>
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-check-lg me-1"></i>Enregistrer
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
 
 {% endblock %}
 
 {% block scripts %}
-
 <script>
-
-// Format automatique téléphone
-
-document.getElementById("telephone")
-.addEventListener("input", function(){
-
-let value = this.value.replace(/\D/g,'')
-
-if(value.length > 2)
-value = value.replace(/(\d{2})(\d+)/, "$1 $2")
-
-if(value.length > 5)
-value = value.replace(/(\d{2}) (\d{2})(\d+)/, "$1 $2 $3")
-
-if(value.length > 8)
-value = value.replace(/(\d{2}) (\d{2}) (\d{2})(\d+)/, "$1 $2 $3 $4")
-
-this.value = value
-
-})
-
-
-
-// Validation Bootstrap
-
-(() => {
-
-'use strict'
-
-const forms = document.querySelectorAll('.needs-validation')
-
-Array.from(forms).forEach(form => {
-
-form.addEventListener('submit', event => {
-
-if (!form.checkValidity()) {
-
-event.preventDefault()
-event.stopPropagation()
-
+// Toggle password visibility
+function togglePassword() {
+  var input = document.getElementById('mot_de_passe');
+  var icon = document.getElementById('toggleIcon');
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.classList.replace('bi-eye', 'bi-eye-slash');
+  } else {
+    input.type = 'password';
+    icon.classList.replace('bi-eye-slash', 'bi-eye');
+  }
 }
 
-form.classList.add('was-validated')
+// Phone number auto-format
+document.getElementById('telephone').addEventListener('input', function() {
+  var value = this.value.replace(/\D/g, '');
+  if (value.length > 2) value = value.replace(/(\d{2})(\d+)/, '$1 $2');
+  if (value.length > 5) value = value.replace(/(\d{2}) (\d{2})(\d+)/, '$1 $2 $3');
+  if (value.length > 8) value = value.replace(/(\d{2}) (\d{2}) (\d{2})(\d+)/, '$1 $2 $3 $4');
+  this.value = value;
+});
 
-}, false)
-
-})
-
-})()
-
+// Bootstrap form validation
+(function() {
+  'use strict';
+  var forms = document.querySelectorAll('.needs-validation');
+  Array.from(forms).forEach(function(form) {
+    form.addEventListener('submit', function(event) {
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      form.classList.add('was-validated');
+    }, false);
+  });
+})();
 </script>
-
 {% endblock %}

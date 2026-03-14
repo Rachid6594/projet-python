@@ -1,45 +1,116 @@
-{% extends "base.html" %}
-{% block title %}Consultation médicale{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Consultation medicale{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-  <h2>Consultation de {{ patient.nom }} {{ patient.prenom }} ({{ age }} ans)</h2>
-  <p><strong>Date de naissance :</strong> {{ patient.date_naissance.strftime('%d/%m/%Y') }}</p>
-  <p><strong>Téléphone :</strong> {{ patient.telephone or '—' }}</p>
-  <p><strong>Adresse :</strong> {{ patient.adresse or '—' }}</p>
 
-  <h4 class="mt-4">Historique des consultations</h4>
-  {% if historique %}
-    <ul class="list-group mb-4">
-      {% for c in historique %}
-        <li class="list-group-item">
-          <strong>{{ c.created_at.strftime('%d/%m/%Y') }}</strong> :
-          <em>{{ c.diagnostic or '—' }}</em>
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <div class="alert alert-info">Aucune consultation précédente.</div>
-  {% endif %}
-
-  <form method="post" class="mb-4">
-    <div class="mb-3">
-      <label for="symptomes" class="form-label">Symptômes</label>
-      <textarea class="form-control" id="symptomes" name="symptomes" rows="2"></textarea>
-    </div>
-    <div class="mb-3">
-      <label for="diagnostic" class="form-label">Diagnostic</label>
-      <textarea class="form-control" id="diagnostic" name="diagnostic" rows="2"></textarea>
-    </div>
-    <div class="mb-3">
-      <label for="traitement" class="form-label">Traitement prescrit</label>
-      <textarea class="form-control" id="traitement" name="traitement" rows="2"></textarea>
-    </div>
-    <div class="mb-3">
-      <label for="observations" class="form-label">Observations</label>
-      <textarea class="form-control" id="observations" name="observations" rows="2"></textarea>
-    </div>
-    <button type="submit" class="btn btn-success">Enregistrer la consultation</button>
-    <a href="{{ url_for('medecin.calendrier') }}" class="btn btn-secondary ms-2">Retour au calendrier</a>
-  </form>
+{# -- En-tete -- #}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h3 mb-0">
+    <i class="bi bi-heart-pulse me-2"></i>Consultation medicale
+  </h1>
 </div>
+
+<div class="row g-4">
+
+  {# -- Colonne gauche : Infos patient + Historique -- #}
+  <div class="col-lg-4">
+
+    {# Fiche patient #}
+    <div class="card shadow-sm border-0 mb-4">
+      <div class="card-header bg-transparent fw-semibold">
+        <i class="bi bi-person me-1"></i>Informations du patient
+      </div>
+      <div class="card-body">
+        <h5 class="fw-bold mb-3">{{ patient.nom_complet }}</h5>
+        <ul class="list-unstyled mb-0">
+          <li class="mb-2">
+            <span class="text-muted small d-block">Age</span>
+            <span class="fw-semibold">{{ age }} ans</span>
+          </li>
+          <li class="mb-2">
+            <span class="text-muted small d-block">Date de naissance</span>
+            <span>{{ patient.date_naissance.strftime('%d/%m/%Y') }}</span>
+          </li>
+          <li class="mb-2">
+            <span class="text-muted small d-block">Telephone</span>
+            <span>{{ patient.telephone or '&mdash;' }}</span>
+          </li>
+          <li>
+            <span class="text-muted small d-block">Adresse</span>
+            <span>{{ patient.adresse or '&mdash;' }}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    {# Historique consultations #}
+    <div class="card shadow-sm border-0">
+      <div class="card-header bg-transparent fw-semibold">
+        <i class="bi bi-clock-history me-1"></i>Historique consultations
+      </div>
+      <div class="card-body">
+        {% if historique %}
+          {% for c in historique %}
+          <div class="{% if not loop.last %}mb-3 pb-3 border-bottom{% endif %}">
+            <div class="text-muted small mb-1">
+              <i class="bi bi-calendar3 me-1"></i>{{ c.created_at.strftime('%d/%m/%Y') }}
+            </div>
+            <div>{{ c.diagnostic or '&mdash;' }}</div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <p class="text-muted mb-0">Aucune consultation precedente</p>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+
+  {# -- Colonne droite : Formulaire consultation -- #}
+  <div class="col-lg-8">
+    <div class="card shadow-sm border-0">
+      <div class="card-header bg-transparent fw-semibold">
+        <i class="bi bi-journal-medical me-1"></i>Nouvelle consultation
+      </div>
+      <div class="card-body">
+        <form method="POST">
+          <div class="mb-3">
+            <label for="symptomes" class="form-label">Symptomes</label>
+            <textarea class="form-control" id="symptomes" name="symptomes" rows="3"
+                      placeholder="Decrivez les symptomes du patient..."></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label for="diagnostic" class="form-label">Diagnostic <span class="text-danger">*</span></label>
+            <textarea class="form-control" id="diagnostic" name="diagnostic" rows="3" required
+                      placeholder="Saisissez le diagnostic..."></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label for="traitement" class="form-label">Traitement</label>
+            <textarea class="form-control" id="traitement" name="traitement" rows="3"
+                      placeholder="Prescriptions et posologie..."></textarea>
+          </div>
+
+          <div class="mb-4">
+            <label for="observations" class="form-label">Observations</label>
+            <textarea class="form-control" id="observations" name="observations" rows="3"
+                      placeholder="Notes et observations complementaires..."></textarea>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-success">
+              <i class="bi bi-check-circle me-1"></i>Enregistrer la consultation
+            </button>
+            <a href="{{ url_for('medecin.calendrier') }}" class="btn btn-outline-secondary">
+              <i class="bi bi-arrow-left me-1"></i>Annuler
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>
+
 {% endblock %}

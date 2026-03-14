@@ -1,167 +1,168 @@
 {% extends "base.html" %}
 
+{% block title %}Rendez-vous - HopiGest{% endblock %}
+
 {% block content %}
 
-<div class="container mt-4">
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-
-<h3 class="fw-bold">
-<i class="bi bi-calendar-check text-primary"></i>
-Gestion des Rendez-vous
-</h3>
-
-{% if current_user.role in ['secretaire', 'admin'] %}
-<a href="{{ url_for('rendez_vous.create') }}" class="btn btn-primary shadow-sm">
-<i class="bi bi-calendar-plus"></i>
-Nouveau rendez-vous
-</a>
-{% endif %}
-
+<!-- Cancel Confirmation Modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title"><i class="bi bi-exclamation-triangle me-2"></i>Confirmation d'annulation</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body">
+        <p>Voulez-vous vraiment annuler le rendez-vous de <strong id="rdvPatientName"></strong> ?</p>
+        <p class="text-muted small mb-0">Cette action est irreversible.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">
+          <i class="bi bi-x-lg me-1"></i>Fermer
+        </button>
+        <form id="cancelForm" method="POST">
+          <button type="submit" class="btn btn-danger">
+            <i class="bi bi-x-circle me-1"></i>Annuler le RDV
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="card shadow-sm">
-
-<div class="card-body">
-
-<table id="rdvTable" class="table table-hover align-middle shadow-sm">
-
-<thead class="table-primary">
-
-<tr>
-<th>Date</th>
-<th>Heure</th>
-<th>Patient</th>
-<th>Médecin</th>
-<th>Motif</th>
-<th>Statut</th>
-<th style="width:180px">Actions</th>
-</tr>
-
-</thead>
-
-<tbody>
-
-{% for rdv in rendez_vous %}
-
-<tr>
-
-<td>{{ rdv.date.strftime('%d/%m/%Y') }}</td>
-<td>{{ rdv.heure.strftime('%H:%M') }}</td>
-<td>{{ rdv.patient.prenom }} {{ rdv.patient.nom }}</td>
-<td>Dr {{ rdv.medecin.nom }}</td>
-<td>{{ rdv.motif if rdv.motif else '-' }}</td>
-<td>
-{% if rdv.statut == 'programme' %}
-<span class="badge bg-primary">Programmé</span>
-{% elif rdv.statut == 'effectue' %}
-<span class="badge bg-success">Effectué</span>
-{% elif rdv.statut == 'annule' %}
-<span class="badge bg-danger">Annulé</span>
-{% endif %}
-</td>
-
-<td class="text-center">
-
-<a href="{{ url_for('rendez_vous.show', id=rdv.id) }}"
-class="btn btn-sm btn-outline-info"
-title="Détails">
-
-<i class="bi bi-eye"></i>
-</a>
-
-{% if current_user.role in ['secretaire', 'admin'] and rdv.statut != 'effectue' %}
-
-<a href="{{ url_for('rendez_vous.edit', id=rdv.id) }}"
-class="btn btn-sm btn-outline-warning me-1"
-title="Modifier">
-
-<i class="bi bi-pencil-square"></i>
-</a>
-
-{% if rdv.statut == 'programme' %}
-<form method="POST" action="{{ url_for('rendez_vous.cancel', id=rdv.id) }}" style="display: inline;">
-<button
-class="btn btn-sm btn-outline-danger"
-title="Annuler"
-onclick="return confirm('Voulez-vous vraiment annuler ce rendez-vous ?')">
-
-<i class="bi bi-x-circle"></i>
-
-</button>
-</form>
-{% endif %}
-
-{% endif %}
-
-</td>
-
-</tr>
-
-{% endfor %}
-
-</tbody>
-
-</table>
-
+<!-- Page Header -->
+<div class="page-header">
+  <h1><i class="bi bi-calendar-event-fill"></i> Rendez-vous</h1>
+  {% if current_user.role in ['secretaire', 'admin'] %}
+  <a href="{{ url_for('rendez_vous.create') }}" class="btn btn-primary">
+    <i class="bi bi-calendar-plus me-1"></i>Nouveau RDV
+  </a>
+  {% endif %}
 </div>
 
-</div>
-
+<!-- Appointment List -->
+<div class="card animate-in">
+  <div class="card-header">
+    <i class="bi bi-list-ul me-2"></i>Liste des rendez-vous
+  </div>
+  <div class="card-body">
+    {% if rendez_vous %}
+    <div class="table-responsive">
+      <table id="rdvTable" class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Heure</th>
+            <th>Patient</th>
+            <th>Medecin</th>
+            <th>Motif</th>
+            <th>Statut</th>
+            <th style="width: 180px">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for rdv in rendez_vous %}
+          <tr>
+            <td>{{ rdv.date.strftime('%d/%m/%Y') }}</td>
+            <td>{{ rdv.heure.strftime('%H:%M') if rdv.heure else '---' }}</td>
+            <td class="fw-semibold">{{ rdv.patient.nom_complet }}</td>
+            <td>{{ rdv.medecin.nom_complet }}</td>
+            <td>{{ rdv.motif or '---' }}</td>
+            <td>
+              {% if rdv.statut == 'programme' %}
+                <span class="badge badge-primary">Programme</span>
+              {% elif rdv.statut == 'effectue' %}
+                <span class="badge badge-success">Effectue</span>
+              {% elif rdv.statut == 'annule' %}
+                <span class="badge badge-danger">Annule</span>
+              {% else %}
+                <span class="badge badge-primary">{{ rdv.statut }}</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="d-flex gap-1">
+                <a href="{{ url_for('rendez_vous.show', id=rdv.id) }}"
+                   class="btn btn-sm btn-outline-info" title="Voir">
+                  <i class="bi bi-eye"></i>
+                </a>
+                {% if rdv.statut == 'programme' %}
+                <a href="{{ url_for('rendez_vous.edit', id=rdv.id) }}"
+                   class="btn btn-sm btn-outline-warning" title="Modifier">
+                  <i class="bi bi-pencil-square"></i>
+                </a>
+                <button class="btn btn-sm btn-outline-danger" title="Annuler"
+                        onclick="confirmCancel('{{ rdv.id }}', '{{ rdv.patient.nom_complet }}')">
+                  <i class="bi bi-x-circle"></i>
+                </button>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <i class="bi bi-calendar-x"></i>
+      <h4>Aucun rendez-vous enregistre</h4>
+      <p>Commencez par planifier un nouveau rendez-vous.</p>
+      {% if current_user.role in ['secretaire', 'admin'] %}
+      <a href="{{ url_for('rendez_vous.create') }}" class="btn btn-primary mt-2">
+        <i class="bi bi-calendar-plus me-1"></i>Nouveau RDV
+      </a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
 </div>
 
 {% endblock %}
 
-
-
 {% block scripts %}
-
 <script>
-
-$(document).ready(function(){
-
-    $('#rdvTable').DataTable({
-        pageLength: 10,
-        responsive: true,
-        order: [[0, 'desc'], [1, 'desc']],
-        dom: '<"d-flex justify-content-between mb-3"Bf>rtip',
-
-        buttons: [
-
-          {
-            extend: 'excel',
-            text: '<i class="bi bi-file-earmark-excel"></i> Excel',
-            className: 'btn btn-success btn-sm me-2'
-          },
-
-          {
-           extend: 'pdf',
-           text: '<i class="bi bi-file-earmark-pdf"></i> PDF',
-           className: 'btn btn-danger btn-sm me-2'
-          },
-
-           {
-            extend: 'print',
-            text: '<i class="bi bi-printer"></i> Imprimer',
-            className: 'btn btn-dark btn-sm'
-           }
-
-] ,
-
-        language: {
-            search: "🔎 Rechercher :",
-            lengthMenu: "Afficher _MENU_ rendez-vous",
-            info: "Affichage _START_ à _END_ sur _TOTAL_ rendez-vous",
-            paginate: {
-                previous: "Précédent",
-                next: "Suivant"
-            }
-        }
-
-    });
-
+$(document).ready(function() {
+  $('#rdvTable').DataTable({
+    pageLength: 10,
+    responsive: true,
+    order: [[0, 'desc'], [1, 'desc']],
+    dom: '<"d-flex justify-content-between mb-3"Bf>rtip',
+    buttons: [
+      {
+        extend: 'excel',
+        text: '<i class="bi bi-file-earmark-excel"></i> Excel',
+        className: 'btn btn-success btn-sm me-2'
+      },
+      {
+        extend: 'pdf',
+        text: '<i class="bi bi-file-earmark-pdf"></i> PDF',
+        className: 'btn btn-danger btn-sm me-2'
+      },
+      {
+        extend: 'print',
+        text: '<i class="bi bi-printer"></i> Imprimer',
+        className: 'btn btn-dark btn-sm'
+      }
+    ],
+    language: {
+      search: "Rechercher :",
+      lengthMenu: "Afficher _MENU_ rendez-vous",
+      info: "Affichage _START_ a _END_ sur _TOTAL_ rendez-vous",
+      infoEmpty: "Aucun rendez-vous",
+      zeroRecords: "Aucun rendez-vous correspondant",
+      paginate: {
+        previous: "Precedent",
+        next: "Suivant"
+      }
+    }
+  });
 });
 
+function confirmCancel(rdvId, patientName) {
+  document.getElementById('rdvPatientName').innerText = patientName;
+  document.getElementById('cancelForm').action = "{{ url_for('rendez_vous.annuler', id=0) }}".replace('/0', '/' + rdvId);
+  var modal = new bootstrap.Modal(document.getElementById('cancelModal'));
+  modal.show();
+}
 </script>
-
 {% endblock %}

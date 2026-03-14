@@ -14,7 +14,9 @@ def create_app(config_name='default'):
     _FRONTEND_TEMPLATES  = os.path.join(_ROOT, 'frontend', 'templates')
     _FRONTEND_COMPONENTS = os.path.join(_ROOT, 'frontend', 'components')
 
-    app = Flask(__name__, template_folder=_FRONTEND_TEMPLATES)
+    _FRONTEND_STATIC = os.path.join(_ROOT, 'frontend', 'assets')
+    app = Flask(__name__, template_folder=_FRONTEND_TEMPLATES,
+                static_folder=_FRONTEND_STATIC, static_url_path='/static')
     app.config.from_object(config[config_name])
 
     # Loader Jinja2 : templates/ puis components/

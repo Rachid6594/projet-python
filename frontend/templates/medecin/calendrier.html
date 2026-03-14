@@ -1,74 +1,140 @@
-{% extends "base.html" %}
-{% block title %}Calendrier des rendez-vous{% endblock %}
-{% block content %}
-<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
-<div id="calendar"></div>
+{% extends 'base.html' %}
 
-<!-- Modal -->
-<div class="modal fade" id="rdvModal" tabindex="-1" aria-labelledby="rdvModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="rdvModalLabel">Détail du rendez-vous</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p><strong>Patient :</strong> <span id="modalPatient"></span></p>
-                <p><strong>Date de naissance :</strong> <span id="modalNaissance"></span></p>
-                <p><strong>Statut :</strong> <span id="modalStatut"></span></p>
-            </div>
-            <div class="modal-footer">
-                <a id="btnConsult" class="btn btn-primary" href="#">Démarrer la consultation</a>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-            </div>
-        </div>
-    </div>
+{% block title %}Mon calendrier - HopiGest{% endblock %}
+
+{% block styles %}
+<style>
+  #calendar { min-height: 600px; }
+  .rdv-detail-row { display: flex; align-items: center; gap: .5rem; padding: .5rem 0; font-size: .9rem; }
+  .rdv-detail-row i { color: var(--primary); width: 20px; text-align: center; }
+  .rdv-detail-label { color: var(--text-muted); font-weight: 500; min-width: 70px; }
+  .rdv-detail-value { color: var(--text); font-weight: 600; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+  <h1><i class="bi bi-calendar3"></i> Mon calendrier</h1>
 </div>
 
+<!-- Calendar Card -->
+<div class="card animate-in">
+  <div class="card-body">
+    <div id="calendar"></div>
+  </div>
+</div>
+
+<!-- Modal: RDV Details -->
+<div class="modal fade" id="rdvModal" tabindex="-1" aria-labelledby="rdvModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="rdvModalLabel">
+          <i class="bi bi-calendar2-event me-2"></i>Details du rendez-vous
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body">
+        <div class="rdv-detail-row">
+          <i class="bi bi-person"></i>
+          <span class="rdv-detail-label">Patient</span>
+          <span class="rdv-detail-value" id="rdvPatient"></span>
+        </div>
+        <div class="rdv-detail-row">
+          <i class="bi bi-calendar3"></i>
+          <span class="rdv-detail-label">Date</span>
+          <span class="rdv-detail-value" id="rdvDate"></span>
+        </div>
+        <div class="rdv-detail-row">
+          <i class="bi bi-clock"></i>
+          <span class="rdv-detail-label">Heure</span>
+          <span class="rdv-detail-value" id="rdvHeure"></span>
+        </div>
+        <div class="rdv-detail-row">
+          <i class="bi bi-chat-left-text"></i>
+          <span class="rdv-detail-label">Motif</span>
+          <span class="rdv-detail-value" id="rdvMotif"></span>
+        </div>
+        <div class="rdv-detail-row">
+          <i class="bi bi-flag"></i>
+          <span class="rdv-detail-label">Statut</span>
+          <span id="rdvStatut"></span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Fermer</button>
+        <a href="#" id="btnDemarrer" class="btn btn-success btn-sm" style="display:none">
+          <i class="bi bi-play-fill"></i> Demarrer consultation
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var calendarEl = document.getElementById('calendar');
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay'
-            },
-            locale: 'fr',
-            height: 'auto',
-            events: '/medecin/api/rendezvous',
-            eventClick: function (info) {
-                var event = info.event;
-                var patient = event.extendedProps.patient;
-                document.getElementById('modalPatient').textContent = patient.nom + ' ' + patient.prenom;
-                document.getElementById('modalNaissance').textContent = patient.date_naissance;
-                document.getElementById('modalStatut').textContent = event.extendedProps.statut;
-                document.getElementById('btnConsult').href = "{{ url_for('consultations.demarrer', rdv_id=0) }}".replace('0', event.id);
-                var modal = new bootstrap.Modal(document.getElementById('rdvModal'));
-                modal.show();
-            },
-            nowIndicator: true,
-            selectable: false,
-            eventDisplay: 'block',
-            aspectRatio: 1.5,
-            slotMinTime: "07:00:00",
-            slotMaxTime: "20:00:00"
-        });
-        calendar.render();
-    });
-</script>
-<style>
-    #calendar {
-        max-width: 900px;
-        margin: 30px auto;
-    }
+document.addEventListener('DOMContentLoaded', function() {
+  var calendarEl = document.getElementById('calendar');
+  var rdvModal = new bootstrap.Modal(document.getElementById('rdvModal'));
 
-    @media (max-width: 600px) {
-        #calendar {
-            max-width: 100%;
-        }
+  var calendar = new FullCalendar.Calendar(calendarEl, {
+    locale: 'fr',
+    initialView: 'dayGridMonth',
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'dayGridMonth,timeGridWeek,timeGridDay'
+    },
+    height: 'auto',
+    nowIndicator: true,
+    slotMinTime: '07:00:00',
+    slotMaxTime: '20:00:00',
+    events: '/medecin/api/rendezvous',
+    eventClick: function(info) {
+      info.jsEvent.preventDefault();
+      var event = info.event;
+      var props = event.extendedProps;
+
+      document.getElementById('rdvPatient').textContent = props.patient || '';
+      document.getElementById('rdvMotif').textContent = props.motif || '';
+      document.getElementById('rdvHeure').textContent = props.heure || '';
+
+      // Format date
+      var startDate = event.start;
+      if (startDate) {
+        var options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+        document.getElementById('rdvDate').textContent = startDate.toLocaleDateString('fr-FR', options);
+      } else {
+        document.getElementById('rdvDate').textContent = '';
+      }
+
+      // Statut badge
+      var statut = props.statut || '';
+      var statutEl = document.getElementById('rdvStatut');
+      var badgeClass = 'badge-secondary';
+      if (statut === 'programme') badgeClass = 'badge-primary';
+      else if (statut === 'termine') badgeClass = 'badge-success';
+      else if (statut === 'annule') badgeClass = 'badge-danger';
+      else if (statut === 'en_cours') badgeClass = 'badge-warning';
+      statutEl.innerHTML = '<span class="badge ' + badgeClass + '">' + statut.charAt(0).toUpperCase() + statut.slice(1) + '</span>';
+
+      // Demarrer button
+      var btnDemarrer = document.getElementById('btnDemarrer');
+      if (statut === 'programme') {
+        btnDemarrer.href = '/consultations/demarrer/' + event.id;
+        btnDemarrer.style.display = 'inline-flex';
+      } else {
+        btnDemarrer.style.display = 'none';
+      }
+
+      rdvModal.show();
     }
-</style>
+  });
+
+  calendar.render();
+});
+</script>
 {% endblock %}

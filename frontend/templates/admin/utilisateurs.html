@@ -3,7 +3,7 @@
 
 {% block content %}
 
-{# ── En-tête ── #}
+{# -- En-tete -- #}
 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
   <h1 class="h3 mb-0">
     <i class="bi bi-person-lines-fill me-2"></i>Comptes utilisateurs
@@ -12,26 +12,26 @@
     <button class="btn btn-outline-primary"
             onclick="ouvrirModalCreer('secretaire')"
             data-bs-toggle="modal" data-bs-target="#modalCreer">
-      <i class="bi bi-person-plus me-1"></i>Nouvelle secrétaire
+      <i class="bi bi-person-plus me-1"></i>Nouvelle secretaire
     </button>
     <button class="btn btn-primary"
             onclick="ouvrirModalCreer('medecin')"
             data-bs-toggle="modal" data-bs-target="#modalCreer">
-      <i class="bi bi-person-badge me-1"></i>Nouveau médecin
+      <i class="bi bi-person-badge me-1"></i>Nouveau medecin
     </button>
   </div>
 </div>
 
-{# ── Tableau des comptes ── #}
+{# -- Tableau des comptes -- #}
 <div class="card shadow-sm border-0">
   <div class="table-responsive">
-    <table class="table table-hover align-middle mb-0">
+    <table class="table table-hover align-middle mb-0" id="tableUtilisateurs">
       <thead class="table-light">
         <tr>
           <th>Nom</th>
           <th>Email</th>
-          <th>Rôle</th>
-          <th>Créé le</th>
+          <th>Role</th>
+          <th>Cree le</th>
           <th class="text-end">Actions</th>
         </tr>
       </thead>
@@ -44,15 +44,14 @@
             {% if c.role == 'admin' %}
               <span class="badge bg-danger">admin</span>
             {% elif c.role == 'medecin' %}
-              <span class="badge bg-success">médecin</span>
+              <span class="badge bg-success">medecin</span>
             {% else %}
-              <span class="badge bg-info text-dark">secrétaire</span>
+              <span class="badge bg-info text-dark">secretaire</span>
             {% endif %}
           </td>
           <td class="text-muted small">{{ c.created_at.strftime('%d/%m/%Y') }}</td>
           <td class="text-end">
             {% if c.id != current_user.id %}
-            {# data-* attributes : pas de problème avec apostrophes ou guillemets #}
             <button class="btn btn-sm btn-outline-secondary me-1"
                     onclick="ouvrirModalModifier(this)"
                     data-bs-toggle="modal" data-bs-target="#modalModifier"
@@ -82,21 +81,21 @@
 </div>
 
 
-{# ══════════════════════════════════════════
-   MODAL — CRÉER UN COMPTE
-══════════════════════════════════════════ #}
+{# ====================================================
+   MODAL -- CREER UN COMPTE
+==================================================== #}
 <div class="modal fade" id="modalCreer" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-0 shadow">
       <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title"><i class="bi bi-person-plus me-2"></i>Créer un compte</h5>
+        <h5 class="modal-title"><i class="bi bi-person-plus me-2"></i>Creer un compte</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <form method="POST" action="{{ url_for('admin.nouveau_utilisateur') }}" novalidate>
         <div class="modal-body">
           <div class="row g-3">
             <div class="col-sm-6">
-              <label class="form-label">Prénom <span class="text-danger">*</span></label>
+              <label class="form-label">Prenom <span class="text-danger">*</span></label>
               <input type="text" name="prenom" id="c_prenom" class="form-control" required />
             </div>
             <div class="col-sm-6">
@@ -108,31 +107,31 @@
               <input type="email" name="email" id="c_email" class="form-control" required />
             </div>
             <div class="col-12">
-              <label class="form-label">Rôle <span class="text-danger">*</span></label>
+              <label class="form-label">Role <span class="text-danger">*</span></label>
               <select name="role" id="c_role" class="form-select" required>
                 <option value="">-- Choisir --</option>
-                <option value="secretaire">Secrétaire</option>
-                <option value="medecin">Médecin</option>
+                <option value="secretaire">Secretaire</option>
+                <option value="medecin">Medecin</option>
                 <option value="admin">Admin</option>
               </select>
             </div>
             <div class="col-12" id="c_specialite_row" style="display:none;">
-              <label class="form-label">Spécialité</label>
+              <label class="form-label">Specialite</label>
               <input type="text" name="specialite" id="c_specialite"
-                     class="form-control" placeholder="ex : Médecine générale" />
+                     class="form-control" placeholder="ex : Medecine generale" />
             </div>
             <div class="col-12">
               <label class="form-label">Mot de passe <span class="text-danger">*</span></label>
               <input type="password" name="mot_de_passe" id="c_mdp"
                      class="form-control" required minlength="8" />
-              <div class="form-text">Minimum 8 caractères.</div>
+              <div class="form-text">Minimum 8 caracteres.</div>
             </div>
           </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
           <button type="submit" class="btn btn-primary">
-            <i class="bi bi-check-circle me-1"></i>Créer
+            <i class="bi bi-check-circle me-1"></i>Creer
           </button>
         </div>
       </form>
@@ -141,9 +140,9 @@
 </div>
 
 
-{# ══════════════════════════════════════════
-   MODAL — MODIFIER UN COMPTE
-══════════════════════════════════════════ #}
+{# ====================================================
+   MODAL -- MODIFIER UN COMPTE
+==================================================== #}
 <div class="modal fade" id="modalModifier" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-0 shadow">
@@ -155,7 +154,7 @@
         <div class="modal-body">
           <div class="row g-3">
             <div class="col-sm-6">
-              <label class="form-label">Prénom <span class="text-danger">*</span></label>
+              <label class="form-label">Prenom <span class="text-danger">*</span></label>
               <input type="text" name="prenom" id="m_prenom" class="form-control" required />
             </div>
             <div class="col-sm-6">
@@ -167,10 +166,10 @@
               <input type="email" name="email" id="m_email" class="form-control" required />
             </div>
             <div class="col-12">
-              <label class="form-label">Rôle <span class="text-danger">*</span></label>
+              <label class="form-label">Role <span class="text-danger">*</span></label>
               <select name="role" id="m_role" class="form-select" required>
-                <option value="secretaire">Secrétaire</option>
-                <option value="medecin">Médecin</option>
+                <option value="secretaire">Secretaire</option>
+                <option value="medecin">Medecin</option>
                 <option value="admin">Admin</option>
               </select>
             </div>
@@ -194,9 +193,9 @@
 </div>
 
 
-{# ══════════════════════════════════════════
-   MODAL — CONFIRMER LA SUPPRESSION
-══════════════════════════════════════════ #}
+{# ====================================================
+   MODAL -- CONFIRMER LA SUPPRESSION
+==================================================== #}
 <div class="modal fade" id="modalSupprimer" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-sm">
     <div class="modal-content border-0 shadow">
@@ -207,7 +206,7 @@
       <div class="modal-body text-center">
         <p class="mb-1">Supprimer le compte de</p>
         <p class="fw-bold fs-5" id="supprimerNom"></p>
-        <p class="text-muted small mb-0">Cette action est irréversible.</p>
+        <p class="text-muted small mb-0">Cette action est irreversible.</p>
       </div>
       <div class="modal-footer justify-content-center gap-2">
         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
@@ -226,9 +225,9 @@
 
 {% block scripts %}
 <script>
-// ─────────────────────────────────────────────────────────────────────────
-// Modal CRÉER
-// ─────────────────────────────────────────────────────────────────────────
+// ------------------------------------------------------------------
+// Modal CREER
+// ------------------------------------------------------------------
 function ouvrirModalCreer(role) {
   document.getElementById('c_prenom').value     = '';
   document.getElementById('c_nom').value        = '';
@@ -240,16 +239,16 @@ function ouvrirModalCreer(role) {
     role === 'medecin' ? 'block' : 'none';
 }
 
-// Affiche/masque spécialité à la sélection manuelle du rôle
+// Affiche/masque specialite a la selection manuelle du role
 document.getElementById('c_role').addEventListener('change', function () {
   document.getElementById('c_specialite_row').style.display =
     this.value === 'medecin' ? 'block' : 'none';
 });
 
 
-// ─────────────────────────────────────────────────────────────────────────
+// ------------------------------------------------------------------
 // Modal MODIFIER
-// ─────────────────────────────────────────────────────────────────────────
+// ------------------------------------------------------------------
 function ouvrirModalModifier(btn) {
   document.getElementById('m_prenom').value = btn.dataset.prenom;
   document.getElementById('m_nom').value    = btn.dataset.nom;
@@ -260,12 +259,25 @@ function ouvrirModalModifier(btn) {
 }
 
 
-// ─────────────────────────────────────────────────────────────────────────
+// ------------------------------------------------------------------
 // Modal SUPPRIMER
-// ─────────────────────────────────────────────────────────────────────────
+// ------------------------------------------------------------------
 function ouvrirModalSupprimer(btn) {
   document.getElementById('supprimerNom').textContent = btn.dataset.nom;
   document.getElementById('formSupprimer').action     = btn.dataset.url;
 }
+
+// ------------------------------------------------------------------
+// DataTable init
+// ------------------------------------------------------------------
+$(document).ready(function() {
+  $('#tableUtilisateurs').DataTable({
+    language: {
+      url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json'
+    },
+    pageLength: 15,
+    order: [[3, 'desc']]
+  });
+});
 </script>
 {% endblock %}

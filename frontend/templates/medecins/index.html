@@ -1,206 +1,155 @@
 {% extends "base.html" %}
 
+{% block title %}Medecins - HopiGest{% endblock %}
+
 {% block content %}
-<div class="modal fade" id="deleteModal" tabindex="-1">
 
-<div class="modal-dialog modal-dialog-centered">
-
-<div class="modal-content">
-
-<div class="modal-header bg-danger text-white">
-
-<h5 class="modal-title">
-<i class="bi bi-exclamation-triangle"></i>
-Confirmation
-</h5>
-
-<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title"><i class="bi bi-exclamation-triangle me-2"></i>Confirmation de suppression</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body">
+        <p>Voulez-vous vraiment supprimer le medecin <strong id="medecinName"></strong> ?</p>
+        <p class="text-muted small mb-0">Cette action est irreversible.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">
+          <i class="bi bi-x-lg me-1"></i>Annuler
+        </button>
+        <form id="deleteForm" method="POST">
+          <button type="submit" class="btn btn-danger">
+            <i class="bi bi-trash me-1"></i>Supprimer
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="modal-body">
-
-Voulez-vous supprimer le médecin :
-
-<strong id="medecinName"></strong> ?
+<!-- Page Header -->
+<div class="page-header">
+  <h1><i class="bi bi-hospital"></i> Medecins</h1>
+  <a href="{{ url_for('medecins.create') }}" class="btn btn-primary">
+    <i class="bi bi-person-plus-fill me-1"></i>Nouveau medecin
+  </a>
 </div>
 
-<div class="modal-footer">
-
-<button class="btn btn-secondary" data-bs-dismiss="modal">
-Annuler
-</button>
-
-<form id="deleteForm" method="POST">
-
-<button class="btn btn-danger">
-Supprimer
-</button>
-
-</form>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-<div class="container mt-4">
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-
-<h3 class="fw-bold">
-<i class="bi bi-person-badge text-primary"></i>
-Gestion des Médecins
-</h3>
-
-<a href="{{ url_for('medecins.create') }}" class="btn btn-primary shadow-sm">
-<i class="bi bi-person-plus-fill"></i>
-Ajouter médecin
-</a>
-
-</div>
-
-<div class="card shadow-sm">
-
-<div class="card-body">
-
-<table id="medecinsTable" class="table table-hover align-middle shadow-sm">
-
-<thead class="table-primary">
-
-<tr>
-<th>Nom</th>
-<th>Prénom</th>
-<th>Spécialité</th>
-<th>Téléphone</th>
-<th style="width:180px">Actions</th>
-</tr>
-
-</thead>
-
-<tbody>
-
-{% for medecin in medecins %}
-
-<tr>
-
-<td>{{ medecin.nom }}</td>
-<td>{{ medecin.prenom }}</td>
-<td>{{ medecin.specialite }}</td>
-<td>{{ medecin.telephone }}</td>
-
-<td class="text-center">
-
-<a href="{{ url_for('medecins.edit', id=medecin.id) }}"
-class="btn btn-sm btn-outline-warning me-1"
-title="Modifier">
-
-<i class="bi bi-pencil-square"></i>
-</a>
-
-<button
-class="btn btn-sm btn-outline-danger"
-onclick="confirmDelete('{{ medecin.id }}', 'Dr {{ medecin.nom }} {{ medecin.prenom }}')">
-
-<i class="bi bi-trash"></i>
-
-</button>
-
-
-
-<a href="{{ url_for('medecins.show', id=medecin.id) }}"
-class="btn btn-sm btn-outline-info"
-title="Profil médecin">
-
-<i class="bi bi-person-vcard"></i>
-</a>
-
-</td>
-
-</tr>
-
-{% endfor %}
-
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-
+<!-- Medecin List -->
+<div class="card animate-in">
+  <div class="card-header">
+    <i class="bi bi-list-ul me-2"></i>Liste des medecins
+  </div>
+  <div class="card-body">
+    {% if medecins %}
+    <div class="table-responsive">
+      <table id="medecinsTable" class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Prenom</th>
+            <th>Specialite</th>
+            <th>Telephone</th>
+            <th>Email</th>
+            <th style="width: 180px">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for medecin in medecins %}
+          <tr>
+            <td class="fw-semibold">{{ medecin.nom }}</td>
+            <td>{{ medecin.prenom }}</td>
+            <td>
+              {% if medecin.specialite %}
+                <span class="badge badge-primary">{{ medecin.specialite }}</span>
+              {% else %}
+                <span class="text-muted">---</span>
+              {% endif %}
+            </td>
+            <td>{{ medecin.telephone or '---' }}</td>
+            <td>{{ medecin.email or '---' }}</td>
+            <td>
+              <div class="d-flex gap-1">
+                <a href="{{ url_for('medecins.show', id=medecin.id) }}"
+                   class="btn btn-sm btn-outline-info" title="Voir le profil">
+                  <i class="bi bi-eye"></i>
+                </a>
+                <a href="{{ url_for('medecins.edit', id=medecin.id) }}"
+                   class="btn btn-sm btn-outline-warning" title="Modifier">
+                  <i class="bi bi-pencil-square"></i>
+                </a>
+                <button class="btn btn-sm btn-outline-danger" title="Supprimer"
+                        onclick="confirmDelete('{{ medecin.id }}', '{{ medecin.nom }} {{ medecin.prenom }}')">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <i class="bi bi-hospital"></i>
+      <h4>Aucun medecin enregistre</h4>
+      <p>Commencez par ajouter un nouveau medecin dans le systeme.</p>
+      <a href="{{ url_for('medecins.create') }}" class="btn btn-primary mt-2">
+        <i class="bi bi-person-plus-fill me-1"></i>Nouveau medecin
+      </a>
+    </div>
+    {% endif %}
+  </div>
 </div>
 
 {% endblock %}
 
-
-
 {% block scripts %}
-
 <script>
-
-$(document).ready(function(){
-
-    $('#medecinsTable').DataTable({
-        pageLength: 10,
-        responsive: true,
-        dom: '<"d-flex justify-content-between mb-3"Bf>rtip',
-
-        buttons: [
-
-          {
-            extend: 'excel',
-            text: '<i class="bi bi-file-earmark-excel"></i> Excel',
-            className: 'btn btn-success btn-sm me-2'
-          },
-
-          {
-           extend: 'pdf',
-           text: '<i class="bi bi-file-earmark-pdf"></i> PDF',
-           className: 'btn btn-danger btn-sm me-2'
-          },
-
-           {
-            extend: 'print',
-            text: '<i class="bi bi-printer"></i> Imprimer',
-            className: 'btn btn-dark btn-sm'
-           }
-
-] ,
-
-        language: {
-            search: "🔎 Rechercher :",
-            lengthMenu: "Afficher _MENU_ médecins",
-            info: "Affichage _START_ à _END_ sur _TOTAL_ médecins",
-            paginate: {
-                previous: "Précédent",
-                next: "Suivant"
-            }
-        }
-
-    });
-
+$(document).ready(function() {
+  $('#medecinsTable').DataTable({
+    pageLength: 10,
+    responsive: true,
+    dom: '<"d-flex justify-content-between mb-3"Bf>rtip',
+    buttons: [
+      {
+        extend: 'excel',
+        text: '<i class="bi bi-file-earmark-excel"></i> Excel',
+        className: 'btn btn-success btn-sm me-2'
+      },
+      {
+        extend: 'pdf',
+        text: '<i class="bi bi-file-earmark-pdf"></i> PDF',
+        className: 'btn btn-danger btn-sm me-2'
+      },
+      {
+        extend: 'print',
+        text: '<i class="bi bi-printer"></i> Imprimer',
+        className: 'btn btn-dark btn-sm'
+      }
+    ],
+    language: {
+      search: "Rechercher :",
+      lengthMenu: "Afficher _MENU_ medecins",
+      info: "Affichage _START_ a _END_ sur _TOTAL_ medecins",
+      infoEmpty: "Aucun medecin",
+      zeroRecords: "Aucun medecin correspondant",
+      paginate: {
+        previous: "Precedent",
+        next: "Suivant"
+      }
+    }
+  });
 });
 
-
-function confirmDelete(medecinId, medecinName){
-
-const form = document.getElementById("deleteForm")
-
-form.action = "/medecins/" + medecinId + "/supprimer"
-
-document.getElementById("medecinName").innerText = medecinName
-
-const modal = new bootstrap.Modal(
-document.getElementById("deleteModal")
-)
-
-modal.show()
-
+function confirmDelete(medecinId, medecinName) {
+  document.getElementById('medecinName').innerText = medecinName;
+  document.getElementById('deleteForm').action = "/medecins/" + medecinId + "/supprimer";
+  var modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+  modal.show();
 }
-
 </script>
-
 {% endblock %}

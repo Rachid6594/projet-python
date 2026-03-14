@@ -1,89 +1,135 @@
-{% extends "base.html" %}
-{% block title %}Tableau de bord Médecin{% endblock %}
+{% extends 'base.html' %}
+
+{% block title %}Mon espace medecin - HopiGest{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-  <h2 class="mb-4">Tableau de bord du Dr. {{ current_user.prenom }} {{ current_user.nom }}</h2>
-<a href="{{ url_for('medecin.calendrier') }}" class="btn btn-outline-primary mb-4">
-   Voir le calendrier des rendez-vous
-</a>
-  <div class="row mb-4">
-    <div class="col-md-4">
-      <div class="card text-center shadow">
-        <div class="card-body">
-          <h5 class="card-title">Consultations ce mois</h5>
-          <p class="display-5">{{ nb_consultations }}</p>
-        </div>
+<!-- Page Header -->
+<div class="page-header">
+  <h1><i class="bi bi-heart-pulse"></i> Mon espace medecin</h1>
+</div>
+
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-xl-4 col-md-6">
+    <div class="stat-card animate-in">
+      <div class="stat-card-icon blue">
+        <i class="bi bi-clipboard2-pulse"></i>
       </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card text-center shadow">
-        <div class="card-body">
-          <h5 class="card-title">Patients vus</h5>
-          <p class="display-5">{{ nb_patients }}</p>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card text-center shadow">
-        <div class="card-body">
-          <h5 class="card-title">Spécialité</h5>
-          <p class="display-6">{{ specialite }}</p>
-        </div>
+      <div class="stat-card-info">
+        <h3>{{ consultations_mois }}</h3>
+        <p>Consultations ce mois</p>
       </div>
     </div>
   </div>
-
-  <div class="row mb-4">
-    <div class="col-md-6">
-      <div class="card shadow">
-        <div class="card-header bg-primary text-white">
-          Prochain rendez-vous
-        </div>
-        <div class="card-body">
-          {% if prochain_rdv %}
-            <strong>Heure :</strong> {{ prochain_rdv.heure.strftime('%H:%M') }}<br>
-            <strong>Patient :</strong> {{ prochain_rdv.patient.nom }} {{ prochain_rdv.patient.prenom }}<br>
-            <strong>Motif :</strong> {{ prochain_rdv.motif or "—" }}
-          {% else %}
-            <em>Aucun rendez-vous à venir aujourd'hui.</em>
-          {% endif %}
-        </div>
+  <div class="col-xl-4 col-md-6">
+    <div class="stat-card animate-in" style="animation-delay:.05s">
+      <div class="stat-card-icon green">
+        <i class="bi bi-people"></i>
       </div>
-    </div>
-    <div class="col-md-6">
-      <div class="card shadow">
-        <div class="card-header bg-success text-white">
-          Dernier patient consulté
-        </div>
-        <div class="card-body">
-          {% if dernier_patient %}
-            <strong>Nom :</strong> {{ dernier_patient.nom }} {{ dernier_patient.prenom }}<br>
-            <strong>Date de naissance :</strong> {{ dernier_patient.date_naissance.strftime('%d/%m/%Y') }}
-          {% else %}
-            <em>Aucune consultation récente.</em>
-          {% endif %}
-        </div>
+      <div class="stat-card-info">
+        <h3>{{ patients_vus }}</h3>
+        <p>Patients vus</p>
       </div>
     </div>
   </div>
+  <div class="col-xl-4 col-md-12">
+    <div class="stat-card animate-in" style="animation-delay:.1s">
+      <div class="stat-card-icon orange">
+        <i class="bi bi-award"></i>
+      </div>
+      <div class="stat-card-info">
+        <h3>{{ medecin.specialite }}</h3>
+        <p>Specialite</p>
+      </div>
+    </div>
+  </div>
+</div>
 
-  <h4 class="mb-3">Rendez-vous du jour</h4>
-  {% if rdv_du_jour %}
-    <ul class="list-group">
-      {% for rdv in rdv_du_jour %}
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-          <div>
-            <strong>{{ rdv.heure.strftime('%H:%M') }}</strong> — 
-            {{ rdv.patient.nom }} {{ rdv.patient.prenom }}
-            <span class="text-muted">({{ rdv.motif or "—" }})</span>
+<!-- Prochain RDV -->
+<div class="row g-3 mb-4">
+  <div class="col-12">
+    <div class="card animate-in" style="animation-delay:.15s">
+      <div class="card-header d-flex align-items-center gap-2">
+        <i class="bi bi-clock-history"></i>
+        <strong>Prochain rendez-vous</strong>
+      </div>
+      <div class="card-body">
+        {% if prochain_rdv %}
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+          <div class="stat-card-icon blue" style="width:42px;height:42px;border-radius:.5rem">
+            <i class="bi bi-person"></i>
           </div>
-          <span class="badge bg-secondary">{{ rdv.statut }}</span>
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <div class="alert alert-info">Aucun rendez-vous prévu aujourd'hui.</div>
-  {% endif %}
+          <div>
+            <h5 class="mb-1" style="font-size:.95rem">{{ prochain_rdv.patient.nom_complet }}</h5>
+            <div class="d-flex flex-wrap gap-2" style="font-size:.85rem;color:var(--text-muted)">
+              <span><i class="bi bi-calendar3 me-1"></i>{{ prochain_rdv.date.strftime('%d/%m/%Y') }}</span>
+              <span><i class="bi bi-clock me-1"></i>{{ prochain_rdv.heure.strftime('%H:%M') }}</span>
+              <span><i class="bi bi-chat-left-text me-1"></i>{{ prochain_rdv.motif }}</span>
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <div class="empty-state" style="padding:1.5rem">
+          <i class="bi bi-calendar-x d-block"></i>
+          <h4>Aucun RDV programme</h4>
+          <p>Vous n'avez pas de prochain rendez-vous programme.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RDV du jour -->
+<div class="row g-3">
+  <div class="col-12">
+    <div class="card animate-in" style="animation-delay:.2s">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-calendar2-check"></i>
+          <strong>Rendez-vous du jour</strong>
+        </div>
+        <span class="badge badge-primary">{{ rdv_aujourdhui|length }} RDV</span>
+      </div>
+      <div class="card-body p-0">
+        {% if rdv_aujourdhui %}
+        <table class="table mb-0">
+          <thead>
+            <tr>
+              <th>Heure</th>
+              <th>Patient</th>
+              <th>Motif</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for rdv in rdv_aujourdhui %}
+            <tr>
+              <td><span class="badge badge-info">{{ rdv.heure.strftime('%H:%M') }}</span></td>
+              <td>{{ rdv.patient.nom_complet }}</td>
+              <td>{{ rdv.motif }}</td>
+              <td>
+                {% if rdv.statut == 'programme' %}
+                <a href="{{ url_for('consultations.demarrer', rdv_id=rdv.id) }}" class="btn btn-success btn-sm">
+                  <i class="bi bi-play-fill"></i> Demarrer
+                </a>
+                {% else %}
+                <span class="badge badge-secondary">{{ rdv.statut|capitalize }}</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+          <i class="bi bi-calendar-x d-block"></i>
+          <h4>Aucun rendez-vous aujourd'hui</h4>
+          <p>Vous n'avez pas de rendez-vous programme pour aujourd'hui.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

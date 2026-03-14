@@ -1,171 +1,157 @@
 {% extends "base.html" %}
 
+{% block title %}Fiche patient - HopiGest{% endblock %}
+
 {% block content %}
 
-<div class="container mt-4">
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-
-<h3 class="fw-bold">
-<i class="bi bi-folder2-open text-info"></i>
-Dossier patient
-</h3>
-
-<a href="{{ url_for('patients.index') }}" class="btn btn-outline-secondary">
-<i class="bi bi-arrow-left"></i>
-Retour
-</a>
-
+<!-- Page Header -->
+<div class="page-header">
+  <h1><i class="bi bi-folder2-open"></i> Fiche patient</h1>
+  <a href="{{ url_for('patients.index') }}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i>Retour
+  </a>
 </div>
 
-
-<!-- Informations patient -->
-
-<div class="card shadow-sm mb-4">
-
-<div class="card-body">
-
-<div class="d-flex justify-content-between">
-
-<div>
-
-<h4 class="fw-bold">
-<i class="bi bi-person-circle text-primary"></i>
-{{ patient.prenom }} {{ patient.nom }}
-</h4>
-
-<p class="mb-1">
-<strong>Téléphone :</strong> {{ patient.telephone }}
-</p>
-
-<p class="mb-1">
-<strong>Adresse :</strong> {{ patient.adresse }}
-</p>
-
+<!-- Patient Info Card -->
+<div class="card animate-in mb-4">
+  <div class="card-header">
+    <i class="bi bi-person-circle me-2"></i>Informations personnelles
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-8">
+        <h4 class="fw-bold mb-3">{{ patient.prenom }} {{ patient.nom }}</h4>
+        <div class="row">
+          <div class="col-sm-6 mb-2">
+            <span class="text-muted small d-block">Date de naissance</span>
+            <strong>{{ patient.date_naissance.strftime('%d/%m/%Y') if patient.date_naissance else '---' }}</strong>
+          </div>
+          <div class="col-sm-6 mb-2">
+            <span class="text-muted small d-block">Telephone</span>
+            <strong>{{ patient.telephone or '---' }}</strong>
+          </div>
+          <div class="col-sm-6 mb-2">
+            <span class="text-muted small d-block">Adresse</span>
+            <strong>{{ patient.adresse or '---' }}</strong>
+          </div>
+          <div class="col-sm-6 mb-2">
+            <span class="text-muted small d-block">Sexe</span>
+            {% if patient.sexe == 'M' %}
+              <span class="badge badge-primary">Masculin</span>
+            {% elif patient.sexe == 'F' %}
+              <span class="badge badge-danger">Feminin</span>
+            {% else %}
+              <strong>---</strong>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 text-end">
+        <a href="{{ url_for('patients.edit', id=patient.id) }}" class="btn btn-outline-warning btn-sm">
+          <i class="bi bi-pencil-square me-1"></i>Modifier
+        </a>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="text-end">
-
-<span class="badge bg-primary fs-6 p-2">
-{{ patient.sexe }}
-</span>
-
+<!-- Rendez-vous Card -->
+<div class="card animate-in mb-4">
+  <div class="card-header">
+    <i class="bi bi-calendar-event me-2"></i>Rendez-vous
+  </div>
+  <div class="card-body">
+    {% if patient.rendezvous %}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Heure</th>
+            <th>Medecin</th>
+            <th>Motif</th>
+            <th>Statut</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for rdv in patient.rendezvous %}
+          <tr>
+            <td>{{ rdv.date.strftime('%d/%m/%Y') if rdv.date else '---' }}</td>
+            <td>{{ rdv.heure.strftime('%H:%M') if rdv.heure else '---' }}</td>
+            <td>Dr {{ rdv.medecin.nom }} {{ rdv.medecin.prenom }}</td>
+            <td>{{ rdv.motif or '---' }}</td>
+            <td>
+              {% if rdv.statut == 'programme' %}
+                <span class="badge badge-primary">Programme</span>
+              {% elif rdv.statut == 'effectue' %}
+                <span class="badge badge-success">Effectue</span>
+              {% elif rdv.statut == 'annule' %}
+                <span class="badge badge-danger">Annule</span>
+              {% else %}
+                <span class="badge badge-primary">{{ rdv.statut }}</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <i class="bi bi-calendar-x"></i>
+      <h4>Aucun rendez-vous</h4>
+      <p>Ce patient n'a aucun rendez-vous enregistre.</p>
+    </div>
+    {% endif %}
+  </div>
 </div>
 
-</div>
+<!-- Consultation History Card -->
+<div class="card animate-in">
+  <div class="card-header">
+    <i class="bi bi-heart-pulse me-2"></i>Historique des consultations
+  </div>
+  <div class="card-body">
+    {% set has_consultations = [] %}
+    {% for rdv in patient.rendezvous %}
+      {% if rdv.consultation %}
+        {% if has_consultations.append(1) %}{% endif %}
+      {% endif %}
+    {% endfor %}
 
-</div>
-
-</div>
-
-
-<!-- RDV à venir -->
-
-<div class="card shadow-sm mb-4">
-
-<div class="card-header fw-bold">
-
-<i class="bi bi-calendar-event"></i>
-Rendez-vous à venir
-
-</div>
-
-<div class="card-body">
-
-<table class="table table-hover">
-
-<thead class="table-light">
-
-<tr>
-<th>Date</th>
-<th>Médecin</th>
-<th>Motif</th>
-</tr>
-
-</thead>
-
-<tbody>
-
-{% for rdv in rdv_a_venir %}
-
-<tr>
-<td>{{ rdv.date }}</td>
-<td>Dr {{ rdv.medecin.nom }}</td>
-<td>{{ rdv.motif }}</td>
-</tr>
-
-{% else %}
-
-<tr>
-<td colspan="3" class="text-center text-muted">
-Aucun rendez-vous prévu
-</td>
-</tr>
-
-{% endfor %}
-
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-
-
-<!-- Consultations passées -->
-
-<div class="card shadow-sm">
-
-<div class="card-header fw-bold">
-
-<i class="bi bi-heart-pulse"></i>
-Historique des consultations
-
-</div>
-
-<div class="card-body">
-
-<table class="table table-bordered table-hover">
-
-<thead class="table-light">
-
-<tr>
-<th>Date</th>
-<th>Diagnostic</th>
-<th>Traitement</th>
-</tr>
-
-</thead>
-
-<tbody>
-
-{% for c in consultations %}
-
-<tr>
-<td>{{ c.rendez_vous.date }}</td>
-<td>{{ c.diagnostic }}</td>
-<td>{{ c.traitement }}</td>
-</tr>
-
-{% else %}
-
-<tr>
-<td colspan="3" class="text-center text-muted">
-Aucune consultation enregistrée
-</td>
-</tr>
-
-{% endfor %}
-
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-
+    {% if has_consultations %}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Medecin</th>
+            <th>Diagnostic</th>
+            <th>Traitement</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for rdv in patient.rendezvous %}
+            {% if rdv.consultation %}
+            <tr>
+              <td>{{ rdv.date.strftime('%d/%m/%Y') if rdv.date else '---' }}</td>
+              <td>Dr {{ rdv.medecin.nom }} {{ rdv.medecin.prenom }}</td>
+              <td>{{ rdv.consultation.diagnostic or '---' }}</td>
+              <td>{{ rdv.consultation.traitement or '---' }}</td>
+            </tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <i class="bi bi-clipboard2-x"></i>
+      <h4>Aucune consultation</h4>
+      <p>Aucune consultation enregistree pour ce patient.</p>
+    </div>
+    {% endif %}
+  </div>
 </div>
 
 {% endblock %}
