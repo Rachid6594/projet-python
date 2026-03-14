@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Consultation médicale{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Consultation de {{ patient.nom }} {{ patient.prenom }} ({{ age }} ans)</h2>
+  <p><strong>Date de naissance :</strong> {{ patient.date_naissance.strftime('%d/%m/%Y') }}</p>
+  <p><strong>Téléphone :</strong> {{ patient.telephone or '—' }}</p>
+  <p><strong>Adresse :</strong> {{ patient.adresse or '—' }}</p>
+
+  <h4 class="mt-4">Historique des consultations</h4>
+  {% if historique %}
+    <ul class="list-group mb-4">
+      {% for c in historique %}
+        <li class="list-group-item">
+          <strong>{{ c.date_creation.strftime('%d/%m/%Y') }}</strong> :
+          <em>{{ c.diagnostic or '—' }}</em>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="alert alert-info">Aucune consultation précédente.</div>
+  {% endif %}
+
+  <form method="post" class="mb-4">
+    <div class="mb-3">
+      <label for="symptomes" class="form-label">Symptômes</label>
+      <textarea class="form-control" id="symptomes" name="symptomes" rows="2"></textarea>
+    </div>
+    <div class="mb-3">
+      <label for="diagnostic" class="form-label">Diagnostic</label>
+      <textarea class="form-control" id="diagnostic" name="diagnostic" rows="2"></textarea>
+    </div>
+    <div class="mb-3">
+      <label for="traitement" class="form-label">Traitement prescrit</label>
+      <textarea class="form-control" id="traitement" name="traitement" rows="2"></textarea>
+    </div>
+    <div class="mb-3">
+      <label for="observations" class="form-label">Observations</label>
+      <textarea class="form-control" id="observations" name="observations" rows="2"></textarea>
+    </div>
+    <button type="submit" class="btn btn-success">Enregistrer la consultation</button>
+    <a href="{{ url_for('medecin.calendrier') }}" class="btn btn-secondary ms-2">Retour au calendrier</a>
+  </form>
+</div>
+{% endblock %}

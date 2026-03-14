@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Calendrier des rendez-vous{% endblock %}
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+<div id="calendar"></div>
+
+<!-- Modal -->
+<div class="modal fade" id="rdvModal" tabindex="-1" aria-labelledby="rdvModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rdvModalLabel">Détail du rendez-vous</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Patient :</strong> <span id="modalPatient"></span></p>
+                <p><strong>Date de naissance :</strong> <span id="modalNaissance"></span></p>
+                <p><strong>Statut :</strong> <span id="modalStatut"></span></p>
+            </div>
+            <div class="modal-footer">
+                <a id="btnConsult" class="btn btn-primary" href="#">Démarrer la consultation</a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            locale: 'fr',
+            height: 'auto',
+            events: '/medecin/api/rendezvous',
+            eventClick: function (info) {
+                var event = info.event;
+                var patient = event.extendedProps.patient;
+                document.getElementById('modalPatient').textContent = patient.nom + ' ' + patient.prenom;
+                document.getElementById('modalNaissance').textContent = patient.date_naissance;
+                document.getElementById('modalStatut').textContent = event.extendedProps.statut;
+                document.getElementById('btnConsult').href = "{{ url_for('consultations.demarrer', rdv_id=0) }}".replace('0', event.id);
+                var modal = new bootstrap.Modal(document.getElementById('rdvModal'));
+                modal.show();
+            },
+            nowIndicator: true,
+            selectable: false,
+            eventDisplay: 'block',
+            aspectRatio: 1.5,
+            slotMinTime: "07:00:00",
+            slotMaxTime: "20:00:00"
+        });
+        calendar.render();
+    });
+</script>
+<style>
+    #calendar {
+        max-width: 900px;
+        margin: 30px auto;
+    }
+
+    @media (max-width: 600px) {
+        #calendar {
+            max-width: 100%;
+        }
+    }
+</style>
+{% endblock %}
