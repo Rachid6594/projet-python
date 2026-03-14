@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+<h3 class="fw-bold">
+<i class="bi bi-calendar-check text-primary"></i>
+Gestion des Rendez-vous
+</h3>
+
+{% if current_user.role in ['secretaire', 'admin'] %}
+<a href="{{ url_for('rendez_vous.create') }}" class="btn btn-primary shadow-sm">
+<i class="bi bi-calendar-plus"></i>
+Nouveau rendez-vous
+</a>
+{% endif %}
+
+</div>
+
+<div class="card shadow-sm">
+
+<div class="card-body">
+
+<table id="rdvTable" class="table table-hover align-middle shadow-sm">
+
+<thead class="table-primary">
+
+<tr>
+<th>Date</th>
+<th>Heure</th>
+<th>Patient</th>
+<th>Médecin</th>
+<th>Motif</th>
+<th>Statut</th>
+<th style="width:180px">Actions</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for rdv in rendez_vous %}
+
+<tr>
+
+<td>{{ rdv.date.strftime('%d/%m/%Y') }}</td>
+<td>{{ rdv.heure.strftime('%H:%M') }}</td>
+<td>{{ rdv.patient.prenom }} {{ rdv.patient.nom }}</td>
+<td>Dr {{ rdv.medecin.nom }}</td>
+<td>{{ rdv.motif if rdv.motif else '-' }}</td>
+<td>
+{% if rdv.statut == 'programme' %}
+<span class="badge bg-primary">Programmé</span>
+{% elif rdv.statut == 'effectue' %}
+<span class="badge bg-success">Effectué</span>
+{% elif rdv.statut == 'annule' %}
+<span class="badge bg-danger">Annulé</span>
+{% endif %}
+</td>
+
+<td class="text-center">
+
+<a href="{{ url_for('rendez_vous.show', id=rdv.id) }}"
+class="btn btn-sm btn-outline-info"
+title="Détails">
+
+<i class="bi bi-eye"></i>
+</a>
+
+{% if current_user.role in ['secretaire', 'admin'] and rdv.statut != 'effectue' %}
+
+<a href="{{ url_for('rendez_vous.edit', id=rdv.id) }}"
+class="btn btn-sm btn-outline-warning me-1"
+title="Modifier">
+
+<i class="bi bi-pencil-square"></i>
+</a>
+
+{% if rdv.statut == 'programme' %}
+<form method="POST" action="{{ url_for('rendez_vous.cancel', id=rdv.id) }}" style="display: inline;">
+<button
+class="btn btn-sm btn-outline-danger"
+title="Annuler"
+onclick="return confirm('Voulez-vous vraiment annuler ce rendez-vous ?')">
+
+<i class="bi bi-x-circle"></i>
+
+</button>
+</form>
+{% endif %}
+
+{% endif %}
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}
+
+
+
+{% block scripts %}
+
+<script>
+
+$(document).ready(function(){
+
+    $('#rdvTable').DataTable({
+        pageLength: 10,
+        responsive: true,
+        order: [[0, 'desc'], [1, 'desc']],
+        dom: '<"d-flex justify-content-between mb-3"Bf>rtip',
+
+        buttons: [
+
+          {
+            extend: 'excel',
+            text: '<i class="bi bi-file-earmark-excel"></i> Excel',
+            className: 'btn btn-success btn-sm me-2'
+          },
+
+          {
+           extend: 'pdf',
+           text: '<i class="bi bi-file-earmark-pdf"></i> PDF',
+           className: 'btn btn-danger btn-sm me-2'
+          },
+
+           {
+            extend: 'print',
+            text: '<i class="bi bi-printer"></i> Imprimer',
+            className: 'btn btn-dark btn-sm'
+           }
+
+] ,
+
+        language: {
+            search: "🔎 Rechercher :",
+            lengthMenu: "Afficher _MENU_ rendez-vous",
+            info: "Affichage _START_ à _END_ sur _TOTAL_ rendez-vous",
+            paginate: {
+                previous: "Précédent",
+                next: "Suivant"
+            }
+        }
+
+    });
+
+});
+
+</script>
+
+{% endblock %}

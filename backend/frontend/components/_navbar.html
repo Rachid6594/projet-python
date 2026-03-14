@@ -1,0 +1,85 @@
+{# ─────────────────────────────────────────────────────────────────────────
+   Composant : barre de navigation principale
+   Inclus dans : base.html
+   Dépendances : current_user (Flask-Login), request (Flask)
+───────────────────────────────────────────────────────────────────────── #}
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+  <div class="container-fluid">
+
+    {# ── Logo ── #}
+    <a class="navbar-brand fw-bold" href="{{ url_for('auth.login') }}">
+      <i class="bi bi-hospital me-2"></i>Cabinet Médical
+    </a>
+
+    {# ── Bouton hamburger (mobile) ── #}
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarMain"
+      aria-controls="navbarMain"
+      aria-expanded="false"
+      aria-label="Basculer la navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    {# ── Liens (visibles uniquement si connecté) ── #}
+    <div class="collapse navbar-collapse" id="navbarMain">
+      {% if current_user.is_authenticated %}
+
+      {# Liens gauche #}
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+        {# Patients & Médecins : secrétaire / admin uniquement #}
+        {% if current_user.role in ('secretaire', 'admin') %}
+        <li class="nav-item">
+          <a class="nav-link {% if request.blueprint == 'patients' %}active{% endif %}"
+             href="{{ url_for('patients.index') }}">
+            <i class="bi bi-people me-1"></i>Patients
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.blueprint == 'medecins' %}active{% endif %}"
+             href="{{ url_for('medecins.index') }}">
+            <i class="bi bi-person-badge me-1"></i>Médecins
+          </a>
+        </li>
+        {% endif %}
+
+        {# Rendez-vous : tous les rôles #}
+        <li class="nav-item">
+          <a class="nav-link {% if request.blueprint == 'rendez_vous' %}active{% endif %}"
+             href="{{ url_for('rendez_vous.index') }}">
+            <i class="bi bi-calendar-check me-1"></i>Rendez-vous
+          </a>
+        </li>
+
+        {# Consultations : tous les rôles #}
+        <li class="nav-item">
+          <a class="nav-link {% if request.blueprint == 'consultations' %}active{% endif %}"
+             href="{{ url_for('consultations.index') }}">
+            <i class="bi bi-clipboard2-pulse me-1"></i>Consultations
+          </a>
+        </li>
+
+        {# Administration : admin uniquement #}
+        {% if current_user.role == 'admin' %}
+        <li class="nav-item">
+          <a class="nav-link {% if request.blueprint == 'admin' %}active{% endif %}"
+             href="{{ url_for('admin.index') }}">
+            <i class="bi bi-shield-lock me-1"></i>Administration
+          </a>
+        </li>
+        {% endif %}
+
+      </ul>
+
+      {# Menu utilisateur (droite) #}
+      {% include '_user_menu.html' %}
+
+      {% endif %}
+    </div>{# /collapse #}
+
+  </div>
+</nav>

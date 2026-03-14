@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="modal fade" id="deleteModal" tabindex="-1">
+
+<div class="modal-dialog modal-dialog-centered">
+
+<div class="modal-content">
+
+<div class="modal-header bg-danger text-white">
+
+<h5 class="modal-title">
+<i class="bi bi-exclamation-triangle"></i>
+Confirmation
+</h5>
+
+<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+</div>
+
+<div class="modal-body">
+
+Voulez-vous supprimer le patient :
+
+<strong id="patientName"></strong> ?
+</div>
+
+<div class="modal-footer">
+
+<button class="btn btn-secondary" data-bs-dismiss="modal">
+Annuler
+</button>
+
+<form id="deleteForm" method="POST">
+
+<button class="btn btn-danger">
+Supprimer
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="container mt-4">
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+<h3 class="fw-bold">
+<i class="bi bi-people-fill text-primary"></i>
+Gestion des Patients
+</h3>
+
+<a href="{{ url_for('patients.create') }}" class="btn btn-primary shadow-sm">
+<i class="bi bi-person-plus-fill"></i>
+Ajouter patient
+</a>
+
+</div>
+
+<div class="card shadow-sm">
+
+<div class="card-body">
+
+<table id="patientsTable" class="table table-hover align-middle shadow-sm">
+
+<thead class="table-primary">
+
+<tr>
+<th>Nom</th>
+<th>Prénom</th>
+<th>Téléphone</th>
+<th>Sexe</th>
+<th style="width:180px">Actions</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for patient in patients %}
+
+<tr>
+
+<td>{{ patient.nom }}</td>
+<td>{{ patient.prenom }}</td>
+<td>{{ patient.telephone }}</td>
+<td>{{ patient.sexe }}</td>
+
+<td class="text-center">
+
+<a href="{{ url_for('patients.edit', id=patient.id) }}"
+class="btn btn-sm btn-outline-warning me-1"
+title="Modifier">
+
+<i class="bi bi-pencil-square"></i>
+</a>
+
+<button
+class="btn btn-sm btn-outline-danger"
+onclick="confirmDelete('{{ patient.id }}', '{{ patient.nom }} {{ patient.prenom }}')">
+
+<i class="bi bi-trash"></i>
+
+</button>
+
+
+
+<a href="{{ url_for('patients.show', id=patient.id) }}"
+class="btn btn-sm btn-outline-info"
+title="Dossier médical">
+
+<i class="bi bi-folder2-open"></i>
+</a>
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}
+
+
+
+{% block scripts %}
+
+<script>
+
+$(document).ready(function(){
+
+    $('#patientsTable').DataTable({
+        pageLength: 10,
+        responsive: true,
+        dom: '<"d-flex justify-content-between mb-3"Bf>rtip',
+
+        buttons: [
+
+          {
+            extend: 'excel',
+            text: '<i class="bi bi-file-earmark-excel"></i> Excel',
+            className: 'btn btn-success btn-sm me-2'
+          },
+
+          {
+           extend: 'pdf',
+           text: '<i class="bi bi-file-earmark-pdf"></i> PDF',
+           className: 'btn btn-danger btn-sm me-2'
+          },
+
+           {
+            extend: 'print',
+            text: '<i class="bi bi-printer"></i> Imprimer',
+            className: 'btn btn-dark btn-sm'
+           }
+
+] ,
+
+        language: {
+            search: "🔎 Rechercher :",
+            lengthMenu: "Afficher _MENU_ patients",
+            info: "Affichage _START_ à _END_ sur _TOTAL_ patients",
+            paginate: {
+                previous: "Précédent",
+                next: "Suivant"
+            }
+        }
+
+    });
+
+});
+
+
+function confirmDelete(patientId, patientName){
+
+const form = document.getElementById("deleteForm")
+
+form.action = "/patients/" + patientId + "/supprimer"
+
+document.getElementById("patientName").innerText = patientName
+
+const modal = new bootstrap.Modal(
+document.getElementById("deleteModal")
+)
+
+modal.show()
+
+}
+
+    const form = document.getElementById("deleteForm");
+
+    form.action = "/patients/" + patientId + "/supprimer";
+
+    const modal = new bootstrap.Modal(
+        document.getElementById("deleteModal")
+    );
+
+    modal.show();
+
+
+</script>
+
+{% endblock %}
