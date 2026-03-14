@@ -12,7 +12,7 @@
     <ul class="list-group mb-4">
       {% for c in historique %}
         <li class="list-group-item">
-          <strong>{{ c.date_creation.strftime('%d/%m/%Y') }}</strong> :
+          <strong>{{ c.created_at.strftime('%d/%m/%Y') }}</strong> :
           <em>{{ c.diagnostic or '—' }}</em>
         </li>
       {% endfor %}

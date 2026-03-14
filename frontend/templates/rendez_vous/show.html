@@ -170,9 +170,9 @@ Ce rendez-vous a été annulé.
 <i class="bi bi-check-circle"></i>
 Ce rendez-vous a été effectué.
 {% if rdv.consultation %}
-<a href="{{ url_for('consultations.show', id=rdv.consultation.id) }}" class="alert-link">
-Voir la consultation
-</a>
+<span class="alert-link">
+✓ Consultation enregistrée
+</span>
 {% endif %}
 </div>
 

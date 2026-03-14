@@ -49,7 +49,7 @@
               <span class="badge bg-info text-dark">secrétaire</span>
             {% endif %}
           </td>
-          <td class="text-muted small">{{ c.date_creation.strftime('%d/%m/%Y') }}</td>
+          <td class="text-muted small">{{ c.created_at.strftime('%d/%m/%Y') }}</td>
           <td class="text-end">
             {% if c.id != current_user.id %}
             {# data-* attributes : pas de problème avec apostrophes ou guillemets #}

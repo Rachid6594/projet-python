@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Ordonnance Médicale</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            font-size: 12px;
+            color: #333;
+            background: white;
+        }
+
+        .page {
+            width: 210mm;
+            height: 297mm;
+            padding: 20mm;
+            background: white;
+        }
+
+        /* En-tête hospitalier */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 3px solid #003366;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+
+        .hospital-info {
+            flex: 1;
+        }
+
+        .hospital-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #003366;
+            margin-bottom: 5px;
+        }
+
+        .hospital-details {
+            font-size: 10px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .hospital-logo {
+            width: 80px;
+            height: 80px;
+            text-align: center;
+            border: 2px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            background: #f9f9f9;
+            font-size: 30px;
+        }
+
+        /* Informations patient et médecin */
+        .patient-medecin {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            gap: 30px;
+        }
+
+        .info-box {
+            flex: 1;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background: #fafafa;
+            border-radius: 3px;
+        }
+
+        .info-label {
+            font-size: 10px;
+            font-weight: bold;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .info-content {
+            font-size: 12px;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        /* Ordonnance */
+        .ordonnance-title {
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #003366;
+            margin: 30px 0 20px 0;
+            text-decoration: underline;
+        }
+
+        .prescription-section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 11px;
+            font-weight: bold;
+            color: #003366;
+            background: #f0f0f0;
+            padding: 5px 8px;
+            margin-bottom: 10px;
+            border-left: 3px solid #003366;
+        }
+
+        .prescription-item {
+            margin-bottom: 12px;
+            padding: 10px;
+            border-left: 2px solid #0066cc;
+            background: white;
+            line-height: 1.6;
+        }
+
+        .prescription-item strong {
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        /* Signature */
+        .signature-section {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .signature-box {
+            text-align: center;
+            width: 150px;
+        }
+
+        .signature-line {
+            border-top: 1px solid #333;
+            margin-top: 10px;
+            padding-top: 5px;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 9px;
+            color: #999;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+
+        .date-footer {
+            text-align: right;
+            margin-top: 20px;
+            font-size: 10px;
+        }
+
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            .page {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <!-- En-tête hospitalier -->
+        <div class="header">
+            <div class="hospital-info">
+                <div class="hospital-name">Cabinet Médical HôpiGest</div>
+                <div class="hospital-details">
+                    123 Rue de la Paix<br>
+                    75000 Paris<br>
+                    Tél: 01 23 45 67 89<br>
+                    Fax: 01 23 45 67 90<br>
+                    SIRET: 12345678901234
+                </div>
+            </div>
+            <div class="hospital-logo">
+                ⚕️
+            </div>
+        </div>
+
+        <!-- Informations patient et médecin -->
+        <div class="patient-medecin">
+            <div class="info-box">
+                <div class="info-label">Patient</div>
+                <div class="info-content">
+                    <strong>{{ patient.nom_complet }}</strong><br>
+                    {% if patient.date_naissance %}
+                        Né(e) le: {{ patient.date_naissance.strftime('%d/%m/%Y') }}<br>
+                    {% endif %}
+                    {% if patient.adresse %}
+                        {{ patient.adresse }}<br>
+                    {% endif %}
+                    {% if patient.telephone %}
+                        Tél: {{ patient.telephone }}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="info-box">
+                <div class="info-label">Médecin</div>
+                <div class="info-content">
+                    <strong>Dr. {{ medecin.prenom }} {{ medecin.nom }}</strong><br>
+                    Spécialité: {{ medecin.specialite }}<br>
+                    {% if medecin.email %}
+                        Email: {{ medecin.email }}<br>
+                    {% endif %}
+                    {% if medecin.telephone %}
+                        Tél: {{ medecin.telephone }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Informations de consultation -->
+        <div class="info-box" style="margin-bottom: 20px;">
+            <div class="info-label">Consultation</div>
+            <div class="info-content">
+                Date: {{ rdv.date.strftime('%d/%m/%Y') }} à {{ rdv.heure.strftime('%H:%M') if rdv.heure else 'N/A' }}
+            </div>
+        </div>
+
+        <!-- Ordonnance -->
+        <div class="ordonnance-title">ORDONNANCE MÉDICALE</div>
+
+        <!-- Diagnostique -->
+        {% if consultation.diagnostic %}
+        <div class="prescription-section">
+            <div class="section-title">Diagnostic</div>
+            <div class="prescription-item">
+                {{ consultation.diagnostic }}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Symptômes -->
+        {% if consultation.symptomes %}
+        <div class="prescription-section">
+            <div class="section-title">Symptômes observés</div>
+            <div class="prescription-item">
+                {{ consultation.symptomes }}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Traitement / Prescriptions -->
+        {% if consultation.traitement %}
+        <div class="prescription-section">
+            <div class="section-title">Traitement Prescrit</div>
+            <div class="prescription-item">
+                {{ consultation.traitement | replace('\n', '<br>') }}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Observations -->
+        {% if consultation.observations %}
+        <div class="prescription-section">
+            <div class="section-title">Observations supplémentaires</div>
+            <div class="prescription-item">
+                {{ consultation.observations }}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Signature -->
+        <div class="signature-section">
+            <div>
+                <p style="font-size: 10px; margin-bottom: 10px;">Signature du médecin</p>
+                <div class="signature-box">
+                    <div class="signature-line"></div>
+                    <p style="font-size: 10px; margin-top: 5px;">Dr. {{ medecin.prenom }} {{ medecin.nom }}</p>
+                </div>
+            </div>
+            <div class="date-footer">
+                Émise le: {{ now.strftime('%d/%m/%Y à %H:%M') }}
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            Cabinet Médical HôpiGest | Ordonnance Médicale | Confidentiel
+        </div>
+    </div>
+</body>
+</html>

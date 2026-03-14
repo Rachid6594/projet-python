@@ -2,21 +2,127 @@
 {% block title %}Consultations{% endblock %}
 
 {% block content %}
-{# ──────────────────────────────────────────────────────────────────────────
-   À DÉVELOPPER PAR MEMBRE 4
-   Module : Espace Médecin, Calendrier & Consultations
-   ▸ 4.1 Tableau de bord médecin (RDV du jour, statistiques personnelles)
-   ▸ 4.3 Interface de consultation médicale :
-         - Fiche patient complète (nom, âge, historique)
-         - Formulaire : symptômes, diagnostic, traitement, observations
-         - Enregistrement + passage du RDV au statut "effectué"
-         - Historique des consultations précédentes du même patient
-────────────────────────────────────────────────────────────────────────── #}
-<div class="alert alert-success d-flex align-items-center gap-3">
-  <i class="bi bi-clipboard2-pulse fs-3"></i>
-  <div>
-    <strong>Module Consultations</strong> — à développer par <strong>Membre 4</strong>.<br>
-    <span class="small">Espace médecin · Saisie des comptes-rendus · Historique patient.</span>
-  </div>
+<div class="container-fluid py-4">
+    <!-- En-tête -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">
+            <i class="bi bi-clipboard2-pulse me-2"></i>Consultations médicales
+        </h1>
+    </div>
+
+    <!-- Filtrage (optionnel) -->
+    <div class="card mb-4 shadow-sm border-0">
+        <div class="card-body">
+            <form method="GET" class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <label for="search" class="form-label">Rechercher un patient</label>
+                    <input type="text" class="form-control" id="search" name="search" placeholder="Nom, prénom...">
+                </div>
+                <div class="col-md-3">
+                    <label for="statut" class="form-label">Statut</label>
+                    <select class="form-select" id="statut" name="statut">
+                        <option value="">Tous</option>
+                        <option value="effectue">Effectuée</option>
+                        <option value="programme">Programmée</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search me-1"></i>Filtrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tableau des consultations -->
+    {% if consultations %}
+    <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Patient</th>
+                        <th>Diagnostic</th>
+                        <th>Traitement</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for consultation in consultations %}
+                    <tr>
+                        <td class="small text-muted">
+                            {{ consultation.created_at.strftime('%d/%m/%Y %H:%M') }}
+                        </td>
+                        <td class="fw-semibold">
+                            {{ consultation.rendez_vous.patient.nom_complet }}
+                        </td>
+                        <td>
+                            <span class="badge bg-info">
+                                {% if consultation.diagnostic %}
+                                    {{ consultation.diagnostic[:50] }}...
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            {% if consultation.traitement %}
+                                <i class="bi bi-check-circle text-success"></i>
+                                Prescrit
+                            {% else %}
+                                <span class="text-muted small">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            {% if consultation.traitement %}
+                            <a href="{{ url_for('ordonnances.generate_pdf', consultation_id=consultation.id) }}"
+                               class="btn btn-sm btn-outline-info"
+                               title="Télécharger l'ordonnance"
+                               target="_blank">
+                                <i class="bi bi-file-pdf"></i> Ordonnance
+                            </a>
+                            {% else %}
+                            <span class="text-muted small">Pas d'ordonnance</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info d-flex align-items-center gap-3">
+        <i class="bi bi-info-circle fs-3"></i>
+        <div>
+            <strong>Aucune consultation</strong><br>
+            <span class="small">Il n'y a pas de consultations enregistrées pour le moment.</span>
+        </div>
+    </div>
+    {% endif %}
 </div>
+
+
+<style>
+    .badge {
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: inline-block;
+    }
+
+    @media (max-width: 768px) {
+        .table {
+            font-size: 0.85rem;
+        }
+
+        .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+    }
+</style>
 {% endblock %}
