@@ -65,7 +65,7 @@ def index():
     """
     if current_user.role == 'medecin':
         # Récupérer la fiche médecin liée au compte connecté
-        medecin = Medecin.query.filter_by(user_id=current_user.id).first_or_404()
+        medecin = Medecin.query.filter_by(utilisateur_id=current_user.id).first_or_404()
         rdvs = (RendezVous.query
                 .filter_by(medecin_id=medecin.id)
                 .order_by(RendezVous.date, RendezVous.heure)
@@ -146,7 +146,7 @@ def show(id):
 
     # Si médecin, vérifier que c'est bien son RDV
     if current_user.role == 'medecin':
-        medecin = Medecin.query.filter_by(user_id=current_user.id).first_or_404()
+        medecin = Medecin.query.filter_by(utilisateur_id=current_user.id).first_or_404()
         if rdv.medecin_id != medecin.id:
             flash("Accès non autorisé", "danger")
             return redirect(url_for("rendez_vous.index"))

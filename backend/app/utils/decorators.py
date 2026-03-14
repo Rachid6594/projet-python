@@ -19,3 +19,17 @@ def medecin_required(f):
             abort(403)
         return f(*args, **kwargs)
     return decorated
+
+
+def role_required(*roles):
+    """Décorateur : vérifie que l'utilisateur a l'un des rôles spécifiés."""
+    def decorator(f):
+        @wraps(f)
+        def decorated(*args, **kwargs):
+            if not current_user.is_authenticated:
+                abort(401)
+            if current_user.role not in roles:
+                abort(403)
+            return f(*args, **kwargs)
+        return decorated
+    return decorator

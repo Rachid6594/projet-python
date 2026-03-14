@@ -46,8 +46,8 @@ def index():
     for m in range(1,13):
 
         count = Consultation.query.filter(
-            extract('month', Consultation.date_creation) == m,
-            extract('year', Consultation.date_creation) == current_year
+            extract('month', Consultation.created_at) == m,
+            extract('year', Consultation.created_at) == current_year
         ).count()
 
         consultations_data.append(count)

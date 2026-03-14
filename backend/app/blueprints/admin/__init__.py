@@ -95,7 +95,7 @@ def nouveau_utilisateur():
             nom=nom, prenom=prenom,
             specialite=specialite or 'Non renseignée',
             email=email,
-            user_id=utilisateur.id,
+            utilisateur_id=utilisateur.id,
         )
         db.session.add(fiche)
 

@@ -38,18 +38,24 @@ def login():
         password = request.form.get('mot_de_passe', '')
         remember = bool(request.form.get('remember'))
 
+        print(f'DEBUG: POST recu - email={email}, pwd_len={len(password)}')
+
         utilisateur = Utilisateur.query.filter_by(email=email).first()
+        print(f'DEBUG: User found = {utilisateur is not None}')
 
-        if utilisateur and utilisateur.check_password(password):
-            login_user(utilisateur, remember=remember)
-            flash(f'Bienvenue, {utilisateur.prenom} !', 'success')
+        if utilisateur:
+            pwd_ok = utilisateur.check_password(password)
+            print(f'DEBUG: Password OK = {pwd_ok}')
+            if pwd_ok:
+                login_user(utilisateur, remember=remember)
+                flash(f'Bienvenue, {utilisateur.prenom} !', 'success')
 
-            # Respecter l'URL "next" (redirection après page protégée)
-            next_page = request.args.get('next')
-            if next_page:
-                return redirect(next_page)
+                # Respecter l'URL "next" (redirection après page protégée)
+                next_page = request.args.get('next')
+                if next_page:
+                    return redirect(next_page)
 
-            return _redirect_after_login(utilisateur)
+                return _redirect_after_login(utilisateur)
 
         # Identifiants incorrects — message générique (sécurité)
         flash('Email ou mot de passe incorrect.', 'danger')

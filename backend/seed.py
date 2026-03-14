@@ -1,85 +1,96 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
-Script de seed : crée une secrétaire et des médecins pour pouvoir utiliser l'application.
-À lancer une fois la base créée : depuis backend/ faire
-    python seed.py
-ou depuis la racine du projet :
-    cd backend && python seed.py
+Script de seed pour initialiser la base de données avec les données de test.
 """
-import sys
-import os
 
-# Ajouter le répertoire backend au path
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import sys
+sys.path.insert(0, '.')
 
 from app import create_app
-from app.extensions import db, bcrypt
+from app.extensions import db
 from app.models.utilisateur import Utilisateur
 from app.models.medecin import Medecin
+from app.models.patient import Patient
 
+def seed_database():
+    """Initialiser la base de données avec les données de test."""
 
-def run_seed():
     app = create_app('development')
-    with app.app_context():
-        if Utilisateur.query.filter_by(email='secretaire@hopital.fr').first():
-            print('Données déjà présentes (secrétaire existe). Rien à faire.')
-            return
 
-        # Secrétaire
+    with app.app_context():
+        # Creer les tables
+        db.create_all()
+        print("[+] Tables creees")
+
+        # Admin
+        admin = Utilisateur(
+            nom='Admin',
+            prenom='Super',
+            email='admin@cabinet.local',
+            role='admin'
+        )
+        admin.set_password('Admin1234!')
+        db.session.add(admin)
+        db.session.flush()
+        print("[+] Admin cree: admin@cabinet.local")
+
+        # Secretaire
         sec = Utilisateur(
             nom='Dupont',
             prenom='Marie',
-            email='secretaire@hopital.fr',
-            mot_de_passe=bcrypt.generate_password_hash('secret123').decode('utf-8'),
+            email='secretaire@cabinet.local',
             role='secretaire'
         )
+        sec.set_password('Secretaire1!')
         db.session.add(sec)
+        db.session.flush()
+        print("[+] Secretaire creee: secretaire@cabinet.local")
 
-        # Médecin 1 + utilisateur
-        u1 = Utilisateur(
+        # Medecin
+        med_user = Utilisateur(
             nom='Martin',
             prenom='Jean',
-            email='jean.martin@hopital.fr',
-            mot_de_passe=bcrypt.generate_password_hash('medecin123').decode('utf-8'),
+            email='dr.martin@cabinet.local',
             role='medecin'
         )
-        db.session.add(u1)
+        med_user.set_password('Medecin1!')
+        db.session.add(med_user)
         db.session.flush()
-        m1 = Medecin(
+
+        med = Medecin(
             nom='Martin',
             prenom='Jean',
-            specialite='Médecine générale',
+            specialite='Medecine generale',
             telephone='01 23 45 67 89',
-            email='jean.martin@hopital.fr',
-            utilisateur_id=u1.id
+            email='dr.martin@cabinet.local',
+            utilisateur_id=med_user.id
         )
-        db.session.add(m1)
-
-        # Médecin 2 + utilisateur
-        u2 = Utilisateur(
-            nom='Bernard',
-            prenom='Sophie',
-            email='sophie.bernard@hopital.fr',
-            mot_de_passe=bcrypt.generate_password_hash('medecin123').decode('utf-8'),
-            role='medecin'
-        )
-        db.session.add(u2)
+        db.session.add(med)
         db.session.flush()
-        m2 = Medecin(
-            nom='Bernard',
-            prenom='Sophie',
-            specialite='Cardiologie',
-            telephone='01 98 76 54 32',
-            email='sophie.bernard@hopital.fr',
-            utilisateur_id=u2.id
+        print("[+] Medecin cree: dr.martin@cabinet.local")
+
+        # Patient
+        from datetime import date
+
+        pat = Patient(
+            nom='Dupuis',
+            prenom='Anne',
+            date_naissance=date(1990, 5, 15),
+            telephone='06 12 34 56 78',
+            adresse='123 Rue de la Paix, 75000 Paris',
+            sexe='F'
         )
-        db.session.add(m2)
+        db.session.add(pat)
 
         db.session.commit()
-        print('Seed OK.')
-        print('  Secrétaire : secretaire@hopital.fr / secret123')
-        print('  Médecin 1  : jean.martin@hopital.fr / medecin123')
-        print('  Médecin 2  : sophie.bernard@hopital.fr / medecin123')
+        print("[+] Patient cree: Anne Dupuis")
 
+        print("")
+        print("=== Comptes disponibles ===")
+        print("Admin: admin@cabinet.local / Admin1234!")
+        print("Secretaire: secretaire@cabinet.local / Secretaire1!")
+        print("Medecin: dr.martin@cabinet.local / Medecin1!")
 
 if __name__ == '__main__':
-    run_seed()
+    seed_database()

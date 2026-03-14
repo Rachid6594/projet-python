@@ -70,7 +70,7 @@ def create():
             specialite=request.form["specialite"],
             telephone=request.form.get("telephone", ""),
             email=email,
-            user_id=utilisateur.id
+            utilisateur_id=utilisateur.id
         )
 
         db.session.add(medecin)

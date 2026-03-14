@@ -31,7 +31,7 @@ medecin_bp = Blueprint('medecin', __name__, url_prefix='/medecin')
 def index():
     """Page d'accueil de l'espace médecin connecté."""
     # Récupérer le médecin connecté
-    medecin = Medecin.query.filter_by(user_id=current_user.id).first()
+    medecin = Medecin.query.filter_by(utilisateur_id=current_user.id).first()
     if not medecin:
         return "Aucun profil médecin associé.", 403
 
@@ -45,8 +45,8 @@ def index():
     consultations_mois = Consultation.query \
         .join(RendezVous, Consultation.rendez_vous_id == RendezVous.id) \
         .filter(RendezVous.medecin_id == medecin.id) \
-        .filter(extract('month', Consultation.date_creation) == mois) \
-        .filter(extract('year', Consultation.date_creation) == annee) \
+        .filter(extract('month', Consultation.created_at) == mois) \
+        .filter(extract('year', Consultation.created_at) == annee) \
         .all()
     nb_consultations = len(consultations_mois)
     patients_vus = {rv.patient_id for rv in RendezVous.query.filter_by(medecin_id=medecin.id).all()}
@@ -65,7 +65,7 @@ def index():
     derniere_consult = Consultation.query \
         .join(RendezVous, Consultation.rendez_vous_id == RendezVous.id) \
         .filter(RendezVous.medecin_id == medecin.id) \
-        .order_by(Consultation.date_creation.desc()) \
+        .order_by(Consultation.created_at.desc()) \
         .first()
     dernier_patient = None
     if derniere_consult:
@@ -85,7 +85,7 @@ def index():
 @medecin_bp.route('/api/rendezvous')
 @login_required
 def api_rendezvous():
-    medecin = Medecin.query.filter_by(user_id=current_user.id).first()
+    medecin = Medecin.query.filter_by(utilisateur_id=current_user.id).first()
     if not medecin:
         return jsonify([])
 

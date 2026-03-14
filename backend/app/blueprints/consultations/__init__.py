@@ -35,7 +35,7 @@ def index():
     """Affiche la liste des consultations (toutes, ou filtrée par médecin)."""
     # TODO : filtre par médecin, par date
     consultations = Consultation.query.order_by(
-        Consultation.date_creation.desc()
+        Consultation.created_at.desc()
     ).all()
     return render_template('consultations/index.html', consultations=consultations)
 
@@ -49,7 +49,7 @@ def index():
 def demarrer(rdv_id):
     rdv = RendezVous.query.get_or_404(rdv_id)
     patient = Patient.query.get_or_404(rdv.patient_id)
-    medecin = Medecin.query.filter_by(user_id=current_user.id).first()
+    medecin = Medecin.query.filter_by(utilisateur_id=current_user.id).first()
     if not medecin or rdv.medecin_id != medecin.id:
         return "Accès interdit", 403
 
@@ -57,7 +57,7 @@ def demarrer(rdv_id):
     historique = Consultation.query \
         .join(RendezVous, Consultation.rendez_vous_id == RendezVous.id) \
         .filter(RendezVous.patient_id == patient.id) \
-        .order_by(Consultation.date_creation.desc()) \
+        .order_by(Consultation.created_at.desc()) \
         .all()
 
     if request.method == 'POST':
@@ -73,7 +73,7 @@ def demarrer(rdv_id):
             diagnostic=diagnostic,
             traitement=traitement,
             observations=observations,
-            date_creation=datetime.utcnow()
+            created_at=datetime.utcnow()
         )
         db.session.add(consultation)
         # Passage du RDV au statut "effectué"
