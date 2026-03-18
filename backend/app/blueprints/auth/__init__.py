@@ -35,7 +35,7 @@ def login():
 
     if request.method == 'POST':
         email    = request.form.get('email', '').strip().lower()
-        password = request.form.get('mot_de_passe', '')
+        password = request.form.get('password', '') or request.form.get('mot_de_passe', '')
         remember = bool(request.form.get('remember'))
 
         print(f'DEBUG: POST recu - email={email}, pwd_len={len(password)}')
