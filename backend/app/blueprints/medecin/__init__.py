@@ -100,17 +100,14 @@ def api_rendezvous():
 
         events.append({
             "id": rdv.id,
-            "title": f"{rdv.patient.nom} {rdv.patient.prenom}",
+            "title": f"{rdv.patient.prenom} {rdv.patient.nom}",
             "start": f"{rdv.date}T{rdv.heure}",
             "end": f"{rdv.date}T{rdv.heure}",
             "color": color,
             "statut": rdv.statut,
-            "patient": {
-                "nom": rdv.patient.nom,
-                "prenom": rdv.patient.prenom,
-                "date_naissance": str(rdv.patient.date_naissance),
-                "id": rdv.patient.id
-            }
+            "motif": rdv.motif or "",
+            "heure": str(rdv.heure)[:5] if rdv.heure else "",
+            "patient": f"{rdv.patient.prenom} {rdv.patient.nom}",
         })
     return jsonify(events)
 
