@@ -160,7 +160,7 @@ $(document).ready(function() {
 
 function confirmCancel(rdvId, patientName) {
   document.getElementById('rdvPatientName').innerText = patientName;
-  document.getElementById('cancelForm').action = "{{ url_for('rendez_vous.annuler', id=0) }}".replace('/0', '/' + rdvId);
+  document.getElementById('cancelForm').action = "{{ url_for('rendez_vous.cancel', id=0) }}".replace('/0', '/' + rdvId);
   var modal = new bootstrap.Modal(document.getElementById('cancelModal'));
   modal.show();
 }

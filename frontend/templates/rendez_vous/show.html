@@ -20,7 +20,7 @@
         <button class="btn btn-outline-secondary" data-bs-dismiss="modal">
           <i class="bi bi-x-lg me-1"></i>Fermer
         </button>
-        <form method="POST" action="{{ url_for('rendez_vous.annuler', id=rdv.id) }}">
+        <form method="POST" action="{{ url_for('rendez_vous.cancel', id=rdv.id) }}">
           <button type="submit" class="btn btn-danger">
             <i class="bi bi-x-circle me-1"></i>Annuler le RDV
           </button>

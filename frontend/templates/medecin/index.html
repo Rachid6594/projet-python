@@ -16,7 +16,7 @@
         <i class="bi bi-clipboard2-pulse"></i>
       </div>
       <div class="stat-card-info">
-        <h3>{{ consultations_mois }}</h3>
+        <h3>{{ nb_consultations }}</h3>
         <p>Consultations ce mois</p>
       </div>
     </div>
@@ -27,7 +27,7 @@
         <i class="bi bi-people"></i>
       </div>
       <div class="stat-card-info">
-        <h3>{{ patients_vus }}</h3>
+        <h3>{{ nb_patients }}</h3>
         <p>Patients vus</p>
       </div>
     </div>
@@ -38,7 +38,7 @@
         <i class="bi bi-award"></i>
       </div>
       <div class="stat-card-info">
-        <h3>{{ medecin.specialite }}</h3>
+        <h3>{{ specialite }}</h3>
         <p>Specialite</p>
       </div>
     </div>
@@ -89,10 +89,10 @@
           <i class="bi bi-calendar2-check"></i>
           <strong>Rendez-vous du jour</strong>
         </div>
-        <span class="badge badge-primary">{{ rdv_aujourdhui|length }} RDV</span>
+        <span class="badge badge-primary">{{ rdv_du_jour|length }} RDV</span>
       </div>
       <div class="card-body p-0">
-        {% if rdv_aujourdhui %}
+        {% if rdv_du_jour %}
         <table class="table mb-0">
           <thead>
             <tr>
@@ -103,7 +103,7 @@
             </tr>
           </thead>
           <tbody>
-            {% for rdv in rdv_aujourdhui %}
+            {% for rdv in rdv_du_jour %}
             <tr>
               <td><span class="badge badge-info">{{ rdv.heure.strftime('%H:%M') }}</span></td>
               <td>{{ rdv.patient.nom_complet }}</td>
